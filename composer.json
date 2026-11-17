@@ -10,8 +10,10 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
+        "intervention/image-laravel": "^4.1",
         "laravel/framework": "^13.17",
-        "laravel/tinker": "^3.0"
+        "laravel/tinker": "^3.0",
+        "najmulhasanbd/laravel-custom-toastr": "^1.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

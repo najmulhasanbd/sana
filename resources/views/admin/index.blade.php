@@ -1,37 +1,7 @@
 @extends('admin.layouts.master')
 @section('title', 'ড্যাশবোর্ড')
 @section('content')
-
- <main class="main-content app-content">
       <div class="container-fluid p-4">
-        <!-- Welcome Banner -->
-        <div class="row mb-4 stagger-anim delay-0">
-          <div class="col-12">
-            <div class="card border-0 rounded-4 p-4 text-white position-relative overflow-hidden welcome-banner"
-              style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); min-height: 180px; box-shadow: 0 15px 40px rgba(99, 102, 241, 0.2);">
-              <!-- Abstract BG shapes -->
-              <div class="position-absolute"
-                style="top: -20px; right: -20px; width: 150px; height: 150px; background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%); border-radius: 50%;">
-              </div>
-              <div class="position-absolute"
-                style="bottom: -50px; right: 100px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%); border-radius: 50%;">
-              </div>
-
-              <div class="d-flex justify-content-between align-items-center position-relative z-1">
-                <div>
-                  <h3 class="fw-bold mb-2">Congratulations, Mahabub! 🎉</h3>
-                  <p class="mb-0 text-white-50" style="font-size: 1.05rem;">You have reached <strong
-                      class="text-white">85%</strong> of your targeted monthly sales milestone.</p>
-                </div>
-                <div class="d-none d-md-block text-end">
-                  <p class="mb-1 text-white-50" style="font-size: 0.9rem;">This Month Sales Profit</p>
-                  <h2 class="fw-bold mb-0">৳ 1.2M</h2>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div class="row g-3 mb-4">
           <div class="col-xxl-3 col-xl-4 col-md-6 col-sm-6 stagger-anim delay-1">
             <div class="single_card stat-card">
@@ -694,5 +664,6 @@
           </div>
         </div>
       </div>
-    </main>
+
+
 @endsection

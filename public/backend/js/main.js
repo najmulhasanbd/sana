@@ -29,6 +29,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (isMobile) {
                 document.body.classList.toggle("sidebar-open");
+                if (toggleIcon) {
+                    const isOpen = document.body.classList.contains("sidebar-open");
+                    toggleIcon.classList.toggle("fa-bars", !isOpen);
+                    toggleIcon.classList.toggle("fa-xmark", isOpen);
+                }
             } else {
                 const isMini = document.body.classList.contains("sidebar-mini");
 
@@ -38,11 +43,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     });
                 }
                 document.body.classList.toggle("sidebar-mini");
-            }
-
-            if (toggleIcon) {
-                toggleIcon.classList.toggle("fa-bars");
-                toggleIcon.classList.toggle("fa-xmark");
+                if (toggleIcon) {
+                    toggleIcon.classList.remove("fa-xmark");
+                    toggleIcon.classList.add("fa-bars");
+                }
             }
         });
     }
@@ -396,41 +400,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 10000);
     }
 
-    // 9. Dark Mode Toggle
-    const moonIcon = document.querySelector('.fa-moon') || document.querySelector('.fa-sun');
-    if (moonIcon) {
-        const themeBtn = moonIcon.closest('.header-action-icon');
-        
-        // Check local storage on load
-        if (localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark-theme');
-            moonIcon.classList.replace('fa-moon', 'fa-sun');
-            if(window.ordersChartInstance) {
-                window.ordersChartInstance.options.scales.y.grid.color = 'rgba(255,255,255,0.05)';
-                window.ordersChartInstance.update();
-            }
-        }
-
-        themeBtn.addEventListener('click', () => {
-            document.body.classList.toggle('dark-theme');
-            if (document.body.classList.contains('dark-theme')) {
-                moonIcon.classList.replace('fa-moon', 'fa-sun');
-                localStorage.setItem('theme', 'dark');
-                // Adjust chart grids for dark mode if needed
-                if(window.ordersChartInstance) {
-                    window.ordersChartInstance.options.scales.y.grid.color = 'rgba(255,255,255,0.05)';
-                    window.ordersChartInstance.update();
-                }
-            } else {
-                moonIcon.classList.replace('fa-sun', 'fa-moon');
-                localStorage.setItem('theme', 'light');
-                if(window.ordersChartInstance) {
-                    window.ordersChartInstance.options.scales.y.grid.color = 'rgba(0,0,0,0.05)';
-                    window.ordersChartInstance.update();
-                }
-            }
-        });
-    }
+    // 9. Dark Mode Removed (Ensures light theme always)
+    document.body.classList.remove('dark-theme');
+    localStorage.removeItem('theme');
 
     // 10. Live Chart Animations (Updating Data Dynamically)
     setInterval(() => {

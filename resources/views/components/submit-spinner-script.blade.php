@@ -1,3 +1,18 @@
+<style>
+    .btn-spinner.hidden,
+    .btn-spinner.d-none {
+        display: none !important;
+    }
+    @keyframes btn-spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    .animate-spin {
+        animation: btn-spin 1s linear infinite !important;
+        display: inline-block;
+    }
+</style>
+
 <script>
     /**
      * Reusable Submit Button Spinner Trait
@@ -35,21 +50,18 @@
 
                 // Disable button
                 btn.disabled = true;
-                btn.classList.add('opacity-80', 'cursor-not-allowed');
+                btn.classList.add('opacity-75', 'cursor-not-allowed');
 
                 // Check for existing spinner or create one
                 let spinner = btn.querySelector('.btn-spinner');
                 if (spinner) {
-                    spinner.classList.remove('hidden');
+                    spinner.classList.remove('hidden', 'd-none');
+                    spinner.style.display = 'inline-flex';
                 } else {
                     spinner = document.createElement('span');
-                    spinner.className = 'btn-spinner inline-flex items-center mr-2';
-                    spinner.innerHTML = `
-                        <svg class="animate-spin h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                    `;
+                    spinner.className = 'btn-spinner spinner-border spinner-border-sm me-2 inline-flex items-center';
+                    spinner.setAttribute('role', 'status');
+                    spinner.setAttribute('aria-hidden', 'true');
                     btn.prepend(spinner);
                 }
 
@@ -71,10 +83,11 @@
                     form.removeAttribute('data-submitting');
                     form.querySelectorAll('button, input[type="submit"]').forEach(function (btn) {
                         btn.disabled = false;
-                        btn.classList.remove('opacity-80', 'cursor-not-allowed');
+                        btn.classList.remove('opacity-75', 'cursor-not-allowed');
                         const spinner = btn.querySelector('.btn-spinner');
                         if (spinner && !btn.classList.contains('always-spin')) {
-                            spinner.classList.add('hidden');
+                            spinner.classList.add('hidden', 'd-none');
+                            spinner.style.display = 'none';
                         }
                     });
                 });

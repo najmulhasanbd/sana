@@ -30,36 +30,77 @@
   </style>
 </head>
 
-<body class="sidebar-collapsed">
+<body>
   <div class="page">
     @include('admin.layouts.header')
 
     @include('admin.layouts.sidebar')
-
-    @yield('content')
+    <main class="main-content app-content">
+      @yield('content')
+    </main>
+    <!-- Bootstrap Toast Container (compatible with template main.js) -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1090;">
+      <div id="liveToast" class="toast border-0 shadow-lg rounded-3" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-white border-0 py-2">
+          <div class="rounded-circle me-2 d-flex align-items-center justify-content-center"
+            style="width: 24px; height: 24px; background: linear-gradient(135deg, #0284c7 0%, #0d9488 100%); color: white;">
+            <i class="fa-solid fa-bell" style="font-size: 0.7rem;"></i>
+          </div>
+          <strong class="me-auto text-dark" style="font-size: 0.88rem;">সানা ফিশারিজ</strong>
+          <small class="text-muted">এখনই</small>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body bg-light rounded-bottom py-2.5 px-3" id="toastMessage" style="font-size: 0.85rem;">
+          New notification received!
+        </div>
+      </div>
+    </div>
   </div>
+  
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <!-- Toast Container -->
-  <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
-    <div id="liveToast" class="toast border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="toast-header bg-white border-0">
-        <div class="rounded me-2 d-flex align-items-center justify-content-center"
-          style="width: 20px; height: 20px; background-color: #6366f1; color: white;">
-          <i class="fa-solid fa-bell" style="font-size: 0.6rem;"></i>
-        </div>
-        <strong class="me-auto" style="color: #2b3674;">System</strong>
-        <small class="text-muted">Just now</small>
-        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-      <div class="toast-body bg-light rounded-bottom" id="toastMessage">
-        New notification received!
-      </div>
-    </div>
-  </div>
+  <!-- Laravel Custom Toastr (najmulhasanbd/laravel-custom-toastr) -->
+  <x-custom-toastr position="top-right" duration="4000" />
+
+  @if(session('success'))
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        if (typeof window.customToastr === 'function') {
+          window.customToastr('Success', @json(session('success')), 'সফল');
+        }
+      });
+    </script>
+  @endif
+  @if(session('error'))
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        if (typeof window.customToastr === 'function') {
+          window.customToastr('Error', @json(session('error')), 'ত্রুটি');
+        }
+      });
+    </script>
+  @endif
+  @if(session('warning'))
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        if (typeof window.customToastr === 'function') {
+          window.customToastr('Warning', @json(session('warning')), 'সতর্কতা');
+        }
+      });
+    </script>
+  @endif
+  @if(session('info'))
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        if (typeof window.customToastr === 'function') {
+          window.customToastr('Info', @json(session('info')), 'তথ্য');
+        }
+      });
+    </script>
+  @endif
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script src="{{ asset('admin/js/main.js') }}"></script>
@@ -68,33 +109,6 @@
   <x-submit-spinner-script />
 
   @stack('scripts')
-  <script>
-    $(document).ready(function () {
-      // Trigger Massive Confetti Animation on Page Load
-      if (typeof confetti === 'function') {
-        setTimeout(function() {
-          var count = 350;
-          var defaults = { 
-            origin: { y: 0.6 }, 
-            zIndex: 10000, 
-            colors: ['#6366f1', '#a855f7', '#10b981', '#f59e0b', '#ec4899', '#3b82f6', '#ef4444'] 
-          };
-
-          function fire(particleRatio, opts) {
-            confetti(Object.assign({}, defaults, opts, {
-              particleCount: Math.floor(count * particleRatio)
-            }));
-          }
-
-          fire(0.25, { spread: 26, startVelocity: 55 });
-          fire(0.2, { spread: 60 });
-          fire(0.35, { spread: 100, decay: 0.91, scalar: 1.2 });
-          fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.5 });
-          fire(0.1, { spread: 140, startVelocity: 45 });
-        }, 300); 
-      }
-    });
-  </script>
 </body>
 
 </html>

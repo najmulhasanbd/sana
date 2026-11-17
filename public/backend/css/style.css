@@ -294,46 +294,72 @@ body {
 }
 
 /* যখন সাইডবার ছোট (Mini) হবে */
-body.sidebar-mini .app-header,
-body.sidebar-mini .main-content {
-    /* বাম পাশের পজিশন ঠিক করা */
-    left: var(--sidebar-collapsed-width) !important;
-
-    /* ডান দিকে যাতে বেশি না যায়, তাই width কমিয়ে দেওয়া (The Main Fix) */
-    width: -webkit-calc(100% - var(--sidebar-collapsed-width)) !important;
-    width: -moz-calc(100% - var(--sidebar-collapsed-width)) !important;
-    width: calc(100% - var(--sidebar-collapsed-width)) !important;
-
-    margin-left: 0 !important;
-}
-
 @media (min-width: 992px) {
-
     body.sidebar-mini .app-sidebar {
-        width: var(--sidebar-collapsed-width);
+        width: var(--sidebar-collapsed-width) !important;
     }
 
-    body.sidebar-mini .app-header,
+    body.sidebar-mini .app-header {
+        left: var(--sidebar-collapsed-width) !important;
+        right: 0 !important;
+        width: auto !important;
+        margin-left: 0 !important;
+    }
+
     body.sidebar-mini .main-content {
-        left: var(--sidebar-collapsed-width);
-        margin-left: 0;
+        margin-left: var(--sidebar-collapsed-width) !important;
+        left: auto !important;
+        width: auto !important;
     }
 
-    body.sidebar-mini .app-sidebar:hover {
-        width: var(--sidebar-width);
-        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.2);
+    /* Mini Sidebar-এ আইটেম ও আইকন সুন্দরভাবে সেন্টারে রাখা */
+    body.sidebar-mini .app-sidebar:not(:hover) .sidebar-header {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        justify-content: center !important;
+    }
+
+    body.sidebar-mini .app-sidebar:not(:hover) .sidebar-header .logo {
+        justify-content: center !important;
+        width: 100% !important;
+    }
+
+    body.sidebar-mini .app-sidebar:not(:hover) .nav-item a,
+    body.sidebar-mini .app-sidebar:not(:hover) .dropdown-header {
+        padding: 12px 0 !important;
+        margin: 4px 10px !important;
+        justify-content: center !important;
+        text-align: center !important;
+    }
+
+    body.sidebar-mini .app-sidebar:not(:hover) .nav-item i:first-child {
+        margin-right: 0 !important;
+        width: 100% !important;
+        text-align: center !important;
+        font-size: 1.25rem !important;
     }
 
     body.sidebar-mini .app-sidebar:not(:hover) span,
     body.sidebar-mini .app-sidebar:not(:hover) .arrow,
-    body.sidebar-mini .app-sidebar:not(:hover) .submenu {
-        opacity: 0;
-        visibility: hidden;
+    body.sidebar-mini .app-sidebar:not(:hover) .submenu,
+    body.sidebar-mini .app-sidebar:not(:hover) .nav-section-title,
+    body.sidebar-mini .app-sidebar:not(:hover) .logo-text,
+    body.sidebar-mini .app-sidebar:not(:hover) .sidebar-footer {
+        opacity: 0 !important;
+        visibility: hidden !important;
         max-height: 0 !important;
+        display: none !important;
     }
 
     body.sidebar-mini .app-sidebar:not(:hover) .sidebar-content {
         overflow-y: hidden;
+    }
+
+    /* Mini Sidebar-এ hover করলে সাবলীলভাবে বড় হওয়া */
+    body.sidebar-mini .app-sidebar:hover {
+        width: var(--sidebar-width) !important;
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.25) !important;
+        z-index: 1005 !important;
     }
 }
 
@@ -920,6 +946,28 @@ body.dark-theme .dataTables_wrapper .page-item.disabled .page-link {
     border-color: #6366f1 !important;
     background-color: #ffffff !important;
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+}
+/* Global Placeholder Styling - Soft & Distinct */
+::placeholder,
+::-webkit-input-placeholder,
+::-moz-placeholder,
+:-ms-input-placeholder {
+    color: #94a3b8 !important;
+    opacity: 0.7 !important;
+    font-weight: 400 !important;
+    font-size: 0.82rem !important;
+    letter-spacing: normal !important;
+}
+
+.form-control::placeholder,
+.form-select::placeholder,
+input::placeholder,
+textarea::placeholder {
+    color: #94a3b8 !important;
+    opacity: 0.7 !important;
+    font-weight: 400 !important;
+    font-size: 0.82rem !important;
+    letter-spacing: normal !important;
 }
 .form-label {
     color: #475569 !important;

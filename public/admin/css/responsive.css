@@ -7,9 +7,6 @@
 
 /* Normal desktop :992px. */
 @media (min-width: 992px) and (max-width: 1200px) {
-.app-header {
-    padding-inline-start: 15rem;
-}
 
 }
 

@@ -7,9 +7,18 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\View\View;
 
 class PasswordController extends Controller
 {
+    /**
+     * Show the password change form.
+     */
+    public function edit(): View
+    {
+        return view('admin.pages.auth.password-change');
+    }
+
     /**
      * Update the user's password.
      */
@@ -23,6 +32,10 @@ class PasswordController extends Controller
         $request->user()->update([
             'password' => Hash::make($validated['password']),
         ]);
+
+        if (function_exists('toastr')) {
+            toastr()->success('পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে!', 'সফল');
+        }
 
         return back()->with('status', 'password-updated');
     }
