@@ -6,8 +6,17 @@
         </button>
     </div>
 
-    <!-- Header Right: Profile Only (Aligned to the far right with ms-auto) -->
+    <!-- Header Right: Cache Clear & Profile (Aligned to the far right with ms-auto) -->
     <div class="header-right ms-auto d-flex align-items-center">
+        <!-- Artisan Cache Clear Action Button -->
+        <a href="{{ route('admin.cache.clear') }}" 
+           class="btn btn-sm btn-light border rounded-pill px-3 py-1.5 me-3 text-secondary d-flex align-items-center gap-1.5 shadow-sm text-decoration-none" 
+           title="Artisan Cache Clear (optimize:clear)"
+           style="font-size: 0.8rem; font-weight: 600;">
+            <i class="fa-solid fa-broom text-primary"></i>
+            <span class="d-none d-sm-inline">ক্যাশ ক্লিয়ার (Artisan)</span>
+        </a>
+
         <div class="user-profile dropdown">
             <div class="profile-toggle d-flex align-items-center" id="profileDropdown" onclick="toggleProfileMenu(event)" style="cursor: pointer;">
                 <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'Admin') }}&background=0284c7&color=fff&bold=true" class="rounded-circle user-img" alt="User" style="width: 38px; height: 38px; object-fit: cover;" />
@@ -31,6 +40,12 @@
                     <a href="{{ route('password.change') }}">
                         <i class="fa-solid fa-key text-primary"></i> 
                         <span>Password Change</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.cache.clear') }}">
+                        <i class="fa-solid fa-broom text-primary"></i> 
+                        <span>Clear Cache (Artisan)</span>
                     </a>
                 </li>
                 <li class="border-top">

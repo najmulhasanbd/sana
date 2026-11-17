@@ -50,3 +50,27 @@ test('authenticated user can view password change page', function () {
     $response->assertSee('পাসওয়ার্ড পরিবর্তন');
     $response->assertSee('btn-submit-with-spinner');
 });
+
+test('user can change password and is redirected to login', function () {
+    $user = User::factory()->create([
+        'password' => bcrypt('old-password'),
+    ]);
+
+    $response = $this->actingAs($user)->put(route('password.change.update'), [
+        'current_password' => 'old-password',
+        'password' => 'new-secure-password',
+        'password_confirmation' => 'new-secure-password',
+    ]);
+
+    $response->assertRedirect(route('login'));
+    $this->assertGuest();
+});
+
+test('admin can clear system cache via artisan route', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->get(route('admin.cache.clear'));
+
+    $response->assertRedirect();
+    $response->assertSessionHas('custom_toastr_messages');
+});

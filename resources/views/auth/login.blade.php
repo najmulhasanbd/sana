@@ -674,6 +674,9 @@
         }
     </script>
 
+    <!-- Laravel Custom Toastr -->
+    <x-custom-toastr position="top-right" duration="5000" />
+
     <!-- Global Submit Button Spinner Trait -->
     <x-submit-spinner-script />
 </body>

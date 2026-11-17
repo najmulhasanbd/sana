@@ -38,7 +38,7 @@
                         </div>
                     </div>
 
-                    <form method="POST" action="{{ route('password.update') }}" id="passwordChangeForm">
+                    <form method="POST" action="{{ route('password.change.update') }}" id="passwordChangeForm">
                         @csrf
                         @method('PUT')
 

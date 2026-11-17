@@ -24,7 +24,11 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
     Route::post('settings', [SettingController::class, 'update'])->name('admin.settings.update');
 
     // Password Change
-    Route::get('password-change', [\App\Http\Controllers\Auth\PasswordController::class, 'edit'])->name('password.change');
+    Route::get('password-change', [PasswordController::class, 'edit'])->name('password.change');
+    Route::put('password-change', [PasswordController::class, 'update'])->name('password.change.update');
+
+    // Artisan Cache Clear
+    Route::get('cache-clear', [AdminController::class, 'clearCache'])->name('admin.cache.clear');
 });
 
 Route::middleware('auth')->group(function () {
