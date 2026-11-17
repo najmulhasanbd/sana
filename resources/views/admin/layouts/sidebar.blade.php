@@ -20,7 +20,7 @@
             <li class="nav-item {{ request()->routeIs('admin.dashboard') || request()->routeIs('dashboard') ? 'active' : '' }}">
                 <a href="{{ route('admin.dashboard') }}">
                     <i class="fa-solid fa-house-chimney"></i>
-                    <span>ড্যাশবোর্ড (Dashboard)</span>
+                    <span>ড্যাশবোর্ড</span>
                 </a>
             </li>
 
@@ -79,7 +79,7 @@
             <li class="nav-item {{ request()->routeIs('admin.supplier.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.supplier.index') }}">
                     <i class="fa-solid fa-truck-ramp-box"></i>
-                    <span>সরবরাহকারী (Suppliers)</span>
+                    <span>সরবরাহকারী</span>
                 </a>
             </li>
 
@@ -152,7 +152,7 @@
             <li class="nav-item {{ request()->routeIs('setting.*') || request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.settings.index') }}">
                     <i class="fa-solid fa-sliders"></i>
-                    <span>সিস্টেম সেটিংস (Settings)</span>
+                    <span>সিস্টেম সেটিংস</span>
                 </a>
             </li>
         </ul>

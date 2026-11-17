@@ -235,13 +235,8 @@
         </div>
 
         @if($districts->hasPages())
-            <div class="card-footer bg-white border-top py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <div class="text-muted small">
-                    মোট <strong>{{ $districts->total() }}</strong> টির মধ্যে <strong>{{ $districts->firstItem() }}</strong> - <strong>{{ $districts->lastItem() }}</strong> দেখানো হচ্ছে
-                </div>
-                <div>
-                    {{ $districts->links('pagination::bootstrap-5') }}
-                </div>
+            <div class="card-footer bg-white border-top py-3 px-4">
+                {{ $districts->links() }}
             </div>
         @endif
     </div>

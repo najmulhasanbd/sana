@@ -242,13 +242,8 @@
         </div>
 
         @if($zones->hasPages())
-            <div class="card-footer bg-white border-top py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <div class="text-muted small">
-                    মোট <strong>{{ $zones->total() }}</strong> টির মধ্যে <strong>{{ $zones->firstItem() }}</strong> - <strong>{{ $zones->lastItem() }}</strong> দেখানো হচ্ছে
-                </div>
-                <div>
-                    {{ $zones->links('pagination::bootstrap-5') }}
-                </div>
+            <div class="card-footer bg-white border-top py-3 px-4">
+                {{ $zones->links() }}
             </div>
         @endif
     </div>

@@ -126,10 +126,9 @@
                         <th class="ps-4 text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem; width: 60px;">#</th>
                         <th class="text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem;">সরবরাহকারী / হ্যাচারি</th>
                         <th class="text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem;">মোবাইল নম্বর</th>
-                        <th class="text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem;">ঠিকানা</th>
-                        <th class="text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem;">মন্তব্য / নোট</th>
+                        <th class="text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem;">লোকেশন</th>
                         <th class="text-center text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem; width: 130px;">স্ট্যাটাস</th>
-                        <th class="pe-4 text-end text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem; width: 120px;">অ্যাকশন</th>
+                        <th class="pe-4 text-end text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem; width: 130px;">অ্যাকশন</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -156,14 +155,28 @@
                                 </a>
                             </td>
                             <td>
-                                <span class="text-secondary" style="font-size: 0.85rem;">
-                                    {{ $supplier->address ?? '—' }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="text-muted text-truncate d-inline-block" style="max-width: 200px; font-size: 0.82rem;" title="{{ $supplier->note }}">
-                                    {{ $supplier->note ?? '—' }}
-                                </span>
+                                @php
+                                    $locDisplay = collect([
+                                        $supplier->zone?->name,
+                                        $supplier->district?->name,
+                                    ])->filter()->implode(', ');
+                                    if (empty($locDisplay) && $supplier->division) {
+                                        $locDisplay = $supplier->division->name;
+                                    }
+                                @endphp
+                                @if(!empty($locDisplay))
+                                    <span class="text-dark fw-medium d-inline-flex align-items-center gap-1" style="font-size: 0.85rem;">
+                                        <i class="fa-solid fa-location-dot text-danger" style="font-size: 0.75rem;"></i>
+                                        <span>{{ $locDisplay }}</span>
+                                    </span>
+                                @elseif(!empty($supplier->address))
+                                    <span class="text-muted d-inline-flex align-items-center gap-1 text-truncate" style="font-size: 0.82rem; max-width: 220px;" title="{{ $supplier->address }}">
+                                        <i class="fa-solid fa-location-dot text-secondary" style="font-size: 0.75rem;"></i>
+                                        <span>{{ Str::limit($supplier->address, 25) }}</span>
+                                    </span>
+                                @else
+                                    <span class="text-muted" style="font-size: 0.85rem;">—</span>
+                                @endif
                             </td>
                             <td class="text-center">
                                 <form action="{{ route('admin.supplier.toggle-status', $supplier) }}" method="POST" class="d-inline">
@@ -180,12 +193,33 @@
                             </td>
                             <td class="pe-4 text-end">
                                 <div class="d-inline-flex gap-1">
+                                    <!-- Eye Icon to Open Detail Popup Modal -->
+                                    <button type="button" 
+                                            class="btn btn-sm btn-outline-info border-0 rounded-circle btn-view-supplier" 
+                                            data-name="{{ $supplier->name }}"
+                                            data-mobile="{{ $supplier->mobile }}"
+                                            data-email="{{ $supplier->email ?? 'প্রযোজ্য নয়' }}"
+                                            data-division="{{ $supplier->division?->name ?? 'প্রযোজ্য নয়' }}"
+                                            data-district="{{ $supplier->district?->name ?? 'প্রযোজ্য নয়' }}"
+                                            data-zone="{{ $supplier->zone?->name ?? 'প্রযোজ্য নয়' }}"
+                                            data-address="{{ $supplier->address ?? 'প্রযোজ্য নয়' }}"
+                                            data-note="{{ $supplier->note ?? 'কোনো মন্তব্য নেই' }}"
+                                            data-status="{{ $supplier->status ? 'সক্রিয় (Active)' : 'নিষ্ক্রিয় (Inactive)' }}"
+                                            data-status-active="{{ $supplier->status ? '1' : '0' }}"
+                                            data-created="{{ $supplier->created_at ? $supplier->created_at->format('d M, Y - h:i A') : '—' }}"
+                                            data-edit-url="{{ route('admin.supplier.edit', $supplier) }}"
+                                            title="বিস্তারিত বিবরণ দেখুন"
+                                            style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                    <!-- Edit Button -->
                                     <a href="{{ route('admin.supplier.edit', $supplier) }}" 
                                        class="btn btn-sm btn-outline-primary border-0 rounded-circle" 
                                        title="সম্পাদনা করুন"
                                        style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </a>
+                                    <!-- Delete Button -->
                                     <button type="button" 
                                             class="btn btn-sm btn-outline-danger border-0 rounded-circle delete-supplier-btn" 
                                             data-id="{{ $supplier->id }}"
@@ -219,17 +253,110 @@
 
         <!-- Pagination Footer -->
         @if($suppliers->hasPages())
-            <div class="card-footer bg-white border-top p-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <small class="text-muted" style="font-size: 0.8rem;">
-                    মোট {{ $suppliers->total() }} টির মধ্যে {{ $suppliers->firstItem() }} থেকে {{ $suppliers->lastItem() }} টি দেখানো হচ্ছে
-                </small>
-                <div>
-                    {{ $suppliers->links() }}
-                </div>
+            <div class="card-footer bg-white border-top py-3 px-4">
+                {{ $suppliers->links() }}
             </div>
         @endif
     </div>
+</div>
 
+<!-- Supplier Details View Modal -->
+<div class="modal fade" id="viewSupplierModal" tabindex="-1" aria-labelledby="viewSupplierModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-light border-bottom py-3 px-4">
+                <div class="d-flex align-items-center gap-2.5">
+                    <div class="rounded-3 d-flex align-items-center justify-content-center text-white flex-shrink-0" 
+                         style="width: 38px; height: 38px; background: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);">
+                        <i class="fa-solid fa-truck-ramp-box fs-5"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark mb-0" id="modalSupplierName">সরবরাহকারীর বিবরণ</h5>
+                        <small class="text-muted" style="font-size: 0.75rem;">হ্যাচারি সরবরাহকারী প্রোফাইল</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <div class="p-3 rounded-3 bg-light border">
+                            <small class="text-muted d-block mb-1" style="font-size: 0.75rem;">মোবাইল নম্বর</small>
+                            <a href="#" id="modalSupplierMobileLink" class="text-decoration-none fw-bold text-dark fs-6 d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-phone text-primary"></i>
+                                <span id="modalSupplierMobile">—</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="p-3 rounded-3 bg-light border">
+                            <small class="text-muted d-block mb-1" style="font-size: 0.75rem;">ইমেইল ঠিকানা</small>
+                            <div class="fw-semibold text-dark fs-6 d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-envelope text-primary"></i>
+                                <span id="modalSupplierEmail">—</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <div class="p-3 rounded-3 bg-light border">
+                            <small class="text-muted d-block mb-1" style="font-size: 0.75rem;">বিভাগ (Division)</small>
+                            <div class="fw-semibold text-dark" id="modalSupplierDivision">—</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="p-3 rounded-3 bg-light border">
+                            <small class="text-muted d-block mb-1" style="font-size: 0.75rem;">জেলা (District)</small>
+                            <div class="fw-semibold text-dark" id="modalSupplierDistrict">—</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="p-3 rounded-3 bg-light border">
+                            <small class="text-muted d-block mb-1" style="font-size: 0.75rem;">জোন / উপজেলা (Zone)</small>
+                            <div class="fw-semibold text-dark" id="modalSupplierZone">—</div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="p-3 rounded-3 bg-light border">
+                            <small class="text-muted d-block mb-1" style="font-size: 0.75rem;">ঠিকানা / লোকেশন</small>
+                            <div class="fw-medium text-dark" id="modalSupplierAddress">—</div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="p-3 rounded-3 bg-light border">
+                            <small class="text-muted d-block mb-1" style="font-size: 0.75rem;">মন্তব্য বা বিশেষ নোট</small>
+                            <div class="text-secondary" id="modalSupplierNote" style="white-space: pre-wrap;">—</div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="p-2.5 rounded-3 bg-light border d-flex align-items-center justify-content-between">
+                            <small class="text-muted">স্ট্যাটাস:</small>
+                            <span id="modalSupplierStatus" class="badge rounded-pill px-3 py-1 fw-semibold bg-success-subtle text-success">সক্রিয়</span>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="p-2.5 rounded-3 bg-light border d-flex align-items-center justify-content-between">
+                            <small class="text-muted">যুক্ত করার তারিখ:</small>
+                            <span id="modalSupplierCreated" class="text-dark fw-semibold small">—</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light border-top py-2.5 px-4 d-flex justify-content-between">
+                <button type="button" class="btn btn-light border px-3 py-2 rounded-3 text-secondary" data-bs-dismiss="modal">
+                    বন্ধ করুন
+                </button>
+                <a href="#" id="modalSupplierEditBtn" class="btn btn-primary px-3 py-2 rounded-3 fw-semibold shadow-sm d-flex align-items-center gap-1.5">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <span>তথ্য সম্পাদনা</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Delete Form (Hidden) -->
 <form id="deleteSupplierForm" method="POST" style="display: none;">
@@ -241,6 +368,50 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // View Supplier Details Modal
+        const viewButtons = document.querySelectorAll('.btn-view-supplier');
+        const modal = new bootstrap.Modal(document.getElementById('viewSupplierModal'));
+
+        viewButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const name = this.getAttribute('data-name');
+                const mobile = this.getAttribute('data-mobile');
+                const email = this.getAttribute('data-email');
+                const division = this.getAttribute('data-division');
+                const district = this.getAttribute('data-district');
+                const zone = this.getAttribute('data-zone');
+                const address = this.getAttribute('data-address');
+                const note = this.getAttribute('data-note');
+                const status = this.getAttribute('data-status');
+                const isActive = this.getAttribute('data-status-active') === '1';
+                const created = this.getAttribute('data-created');
+                const editUrl = this.getAttribute('data-edit-url');
+
+                document.getElementById('modalSupplierName').textContent = name;
+                document.getElementById('modalSupplierMobile').textContent = mobile;
+                document.getElementById('modalSupplierMobileLink').setAttribute('href', 'tel:' + mobile);
+                document.getElementById('modalSupplierEmail').textContent = email;
+                document.getElementById('modalSupplierDivision').textContent = division;
+                document.getElementById('modalSupplierDistrict').textContent = district;
+                document.getElementById('modalSupplierZone').textContent = zone;
+                document.getElementById('modalSupplierAddress').textContent = address;
+                document.getElementById('modalSupplierNote').textContent = note;
+                document.getElementById('modalSupplierCreated').textContent = created;
+                document.getElementById('modalSupplierEditBtn').setAttribute('href', editUrl);
+
+                const statusEl = document.getElementById('modalSupplierStatus');
+                statusEl.textContent = status;
+                if (isActive) {
+                    statusEl.className = 'badge rounded-pill px-3 py-1 fw-semibold bg-success-subtle text-success';
+                } else {
+                    statusEl.className = 'badge rounded-pill px-3 py-1 fw-semibold bg-secondary-subtle text-muted';
+                }
+
+                modal.show();
+            });
+        });
+
+        // Delete Supplier Confirmation
         const deleteButtons = document.querySelectorAll('.delete-supplier-btn');
         const deleteForm = document.getElementById('deleteSupplierForm');
 

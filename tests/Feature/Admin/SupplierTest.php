@@ -85,11 +85,18 @@ class SupplierTest extends TestCase
 
     public function test_can_store_new_supplier_with_validation(): void
     {
+        $division = \App\Models\Division::create(['name' => 'Mymensingh', 'status' => true]);
+        $district = \App\Models\District::create(['division_id' => $division->id, 'name' => 'Mymensingh', 'status' => true]);
+        $zone = \App\Models\Zone::create(['district_id' => $district->id, 'name' => 'Trishal', 'status' => true]);
+
         $response = $this->actingAs($this->user)->post(route('admin.supplier.store'), [
             'name' => 'মেঘনা ফিশ ফার্ম',
             'mobile' => '01700112233',
             'email' => 'meghna@example.com',
-            'address' => 'ত্রিশাল, ময়মনসিংহ',
+            'division_id' => $division->id,
+            'district_id' => $district->id,
+            'zone_id' => $zone->id,
+            'address' => 'বটতলা রোড, ত্রিশাল',
             'note' => 'উন্নত জাতের রেনু সরবরাহকারী',
             'status' => '1',
         ]);
@@ -99,6 +106,9 @@ class SupplierTest extends TestCase
             'name' => 'মেঘনা ফিশ ফার্ম',
             'mobile' => '01700112233',
             'email' => 'meghna@example.com',
+            'division_id' => $division->id,
+            'district_id' => $district->id,
+            'zone_id' => $zone->id,
             'status' => true,
         ]);
     }

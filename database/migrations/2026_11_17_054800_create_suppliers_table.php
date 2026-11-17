@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('suppliers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('division_id')->nullable()->constrained('divisions')->nullOnDelete();
+            $table->foreignId('district_id')->nullable()->constrained('districts')->nullOnDelete();
+            $table->foreignId('zone_id')->nullable()->constrained('zones')->nullOnDelete();
             $table->string('name', 150);
             $table->string('mobile', 30)->index();
             $table->string('email', 100)->nullable();

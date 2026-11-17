@@ -143,6 +143,58 @@
                                 </div>
                             </div>
 
+                            <!-- Location: Division, District, Zone -->
+                            <div class="col-12 col-md-4">
+                                <label for="divisionSelect" class="form-label fw-semibold text-dark" style="font-size: 0.88rem;">
+                                    বিভাগ (Division) <small class="text-muted">(ঐচ্ছিক)</small>
+                                </label>
+                                <select name="division_id" id="divisionSelect" class="select2 form-select" data-placeholder="-- বিভাগ নির্বাচন করুন --">
+                                    <option value="">-- বিভাগ নির্বাচন করুন --</option>
+                                    @foreach($divisions as $div)
+                                        <option value="{{ $div->id }}" {{ old('division_id') == $div->id ? 'selected' : '' }}>
+                                            {{ $div->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('division_id')
+                                    <div class="text-danger mt-1" style="font-size: 0.78rem;">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label for="districtSelect" class="form-label fw-semibold text-dark" style="font-size: 0.88rem;">
+                                    জেলা (District) <small class="text-muted">(ঐচ্ছিক)</small>
+                                </label>
+                                <select name="district_id" id="districtSelect" class="select2 form-select" data-placeholder="-- জেলা নির্বাচন করুন --">
+                                    <option value="">-- জেলা নির্বাচন করুন --</option>
+                                    @foreach($districts as $dist)
+                                        <option value="{{ $dist->id }}" data-division-id="{{ $dist->division_id }}" {{ old('district_id') == $dist->id ? 'selected' : '' }}>
+                                            {{ $dist->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('district_id')
+                                    <div class="text-danger mt-1" style="font-size: 0.78rem;">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label for="zoneSelect" class="form-label fw-semibold text-dark" style="font-size: 0.88rem;">
+                                    জোন / উপজেলা (Zone) <small class="text-muted">(ঐচ্ছিক)</small>
+                                </label>
+                                <select name="zone_id" id="zoneSelect" class="select2 form-select" data-placeholder="-- জোন নির্বাচন করুন --">
+                                    <option value="">-- জোন নির্বাচন করুন --</option>
+                                    @foreach($zones as $z)
+                                        <option value="{{ $z->id }}" data-district-id="{{ $z->district_id }}" {{ old('zone_id') == $z->id ? 'selected' : '' }}>
+                                            {{ $z->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('zone_id')
+                                    <div class="text-danger mt-1" style="font-size: 0.78rem;">{{ $message }}</div>
+                                @enderror
+                            </div>
+
                             <!-- Address -->
                             <div class="col-12">
                                 <label for="address" class="form-label fw-semibold text-dark" style="font-size: 0.88rem;">
@@ -204,7 +256,7 @@
 
 @push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    $(document).ready(function() {
         const statusSwitch = document.getElementById('statusSwitch');
         const statusLabel = document.getElementById('statusLabel');
 
@@ -219,6 +271,60 @@
                 }
             });
         }
+
+        // Cascading Division -> District -> Zone
+        const $division = $('#divisionSelect');
+        const $district = $('#districtSelect');
+        const $zone = $('#zoneSelect');
+
+        const districtOptions = $district.find('option').clone();
+        const zoneOptions = $zone.find('option').clone();
+
+        $division.on('change', function() {
+            const divId = $(this).val();
+
+            $district.empty().append('<option value="">-- জেলা নির্বাচন করুন --</option>');
+            $zone.empty().append('<option value="">-- জোন নির্বাচন করুন --</option>');
+
+            if (divId) {
+                districtOptions.each(function() {
+                    const $opt = $(this);
+                    if ($opt.val() && $opt.data('division-id') == divId) {
+                        $district.append($opt.clone());
+                    }
+                });
+            } else {
+                districtOptions.each(function() {
+                    if ($(this).val()) {
+                        $district.append($(this).clone());
+                    }
+                });
+            }
+            $district.val('').trigger('change.select2');
+            $zone.val('').trigger('change.select2');
+        });
+
+        $district.on('change', function() {
+            const distId = $(this).val();
+
+            $zone.empty().append('<option value="">-- জোন নির্বাচন করুন --</option>');
+
+            if (distId) {
+                zoneOptions.each(function() {
+                    const $opt = $(this);
+                    if ($opt.val() && $opt.data('district-id') == distId) {
+                        $zone.append($opt.clone());
+                    }
+                });
+            } else {
+                zoneOptions.each(function() {
+                    if ($(this).val()) {
+                        $zone.append($(this).clone());
+                    }
+                });
+            }
+            $zone.val('').trigger('change.select2');
+        });
     });
 </script>
 @endpush

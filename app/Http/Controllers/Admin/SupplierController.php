@@ -3,7 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\District;
+use App\Models\Division;
 use App\Models\Supplier;
+use App\Models\Zone;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -18,7 +22,7 @@ class SupplierController extends Controller
         $search = $request->query('search');
         $status = $request->query('status');
 
-        $query = Supplier::query()->latest('id');
+        $query = Supplier::query()->with(['division', 'district', 'zone'])->latest('id');
 
         if (! empty($search)) {
             $query->search($search);
@@ -46,7 +50,11 @@ class SupplierController extends Controller
      */
     public function create(): View
     {
-        return view('admin.pages.supplier.create');
+        $divisions = Division::active()->orderBy('name')->get();
+        $districts = District::with('division')->active()->orderBy('name')->get();
+        $zones = Zone::with('district')->active()->orderBy('name')->get();
+
+        return view('admin.pages.supplier.create', compact('divisions', 'districts', 'zones'));
     }
 
     /**
@@ -58,6 +66,9 @@ class SupplierController extends Controller
             'name' => ['required', 'string', 'max:150'],
             'mobile' => ['required', 'string', 'max:30'],
             'email' => ['nullable', 'email', 'max:100'],
+            'division_id' => ['nullable', 'exists:divisions,id'],
+            'district_id' => ['nullable', 'exists:districts,id'],
+            'zone_id' => ['nullable', 'exists:zones,id'],
             'address' => ['nullable', 'string', 'max:500'],
             'note' => ['nullable', 'string', 'max:1000'],
             'status' => ['nullable'],
@@ -65,6 +76,9 @@ class SupplierController extends Controller
             'name.required' => 'সরবরাহকারীর নাম আবশ্যক।',
             'mobile.required' => 'মোবাইল নম্বর আবশ্যক।',
             'email.email' => 'একটি সঠিক ইমেইল ঠিকানা প্রদান করুন।',
+            'division_id.exists' => 'নির্বাচিত বিভাগ সঠিক নয়।',
+            'district_id.exists' => 'নির্বাচিত জেলা সঠিক নয়।',
+            'zone_id.exists' => 'নির্বাচিত জোন সঠিক নয়।',
         ]);
 
         $validated['status'] = $request->has('status') ? (bool) $request->input('status') : true;
@@ -83,7 +97,11 @@ class SupplierController extends Controller
      */
     public function edit(Supplier $supplier): View
     {
-        return view('admin.pages.supplier.edit', compact('supplier'));
+        $divisions = Division::active()->orderBy('name')->get();
+        $districts = District::with('division')->active()->orderBy('name')->get();
+        $zones = Zone::with('district')->active()->orderBy('name')->get();
+
+        return view('admin.pages.supplier.edit', compact('supplier', 'divisions', 'districts', 'zones'));
     }
 
     /**
@@ -95,6 +113,9 @@ class SupplierController extends Controller
             'name' => ['required', 'string', 'max:150'],
             'mobile' => ['required', 'string', 'max:30'],
             'email' => ['nullable', 'email', 'max:100'],
+            'division_id' => ['nullable', 'exists:divisions,id'],
+            'district_id' => ['nullable', 'exists:districts,id'],
+            'zone_id' => ['nullable', 'exists:zones,id'],
             'address' => ['nullable', 'string', 'max:500'],
             'note' => ['nullable', 'string', 'max:1000'],
             'status' => ['nullable'],
@@ -102,6 +123,9 @@ class SupplierController extends Controller
             'name.required' => 'সরবরাহকারীর নাম আবশ্যক।',
             'mobile.required' => 'মোবাইল নম্বর আবশ্যক।',
             'email.email' => 'একটি সঠিক ইমেইল ঠিকানা প্রদান করুন।',
+            'division_id.exists' => 'নির্বাচিত বিভাগ সঠিক নয়।',
+            'district_id.exists' => 'নির্বাচিত জেলা সঠিক নয়।',
+            'zone_id.exists' => 'নির্বাচিত জোন সঠিক নয়।',
         ]);
 
         $validated['status'] = $request->has('status') ? (bool) $request->input('status') : false;
@@ -116,24 +140,6 @@ class SupplierController extends Controller
     }
 
     /**
-     * Toggle the status of the specified supplier.
-     */
-    public function toggleStatus(Supplier $supplier): RedirectResponse
-    {
-        $supplier->update([
-            'status' => ! $supplier->status,
-        ]);
-
-        $statusText = $supplier->status ? 'সক্রিয়' : 'নিষ্ক্রিয়';
-
-        if (function_exists('toastr')) {
-            toastr()->success("সরবরাহকারীকে {$statusText} করা হয়েছে!", 'স্ট্যাটাস আপডেট');
-        }
-
-        return back();
-    }
-
-    /**
      * Remove the specified supplier from storage.
      */
     public function destroy(Supplier $supplier): RedirectResponse
@@ -145,5 +151,28 @@ class SupplierController extends Controller
         }
 
         return redirect()->route('admin.supplier.index');
+    }
+
+    /**
+     * Toggle the status of the specified supplier via AJAX or standard request.
+     */
+    public function toggleStatus(Supplier $supplier): JsonResponse|RedirectResponse
+    {
+        $supplier->status = ! $supplier->status;
+        $supplier->save();
+
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'status' => $supplier->status,
+                'message' => $supplier->status ? 'সরবরাহকারী সক্রিয় করা হয়েছে' : 'সরবরাহকারী নিষ্ক্রিয় করা হয়েছে',
+            ]);
+        }
+
+        if (function_exists('toastr')) {
+            toastr()->success('স্ট্যাটাস সফলভাবে পরিবর্তন করা হয়েছে!', 'সফল');
+        }
+
+        return back();
     }
 }
