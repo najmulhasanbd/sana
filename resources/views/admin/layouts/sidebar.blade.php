@@ -75,8 +75,16 @@
                 পার্টনার ও হিসাব
             </li>
 
+            <!-- Suppliers (Direct Top-Level Menu for Quick Access) -->
+            <li class="nav-item {{ request()->routeIs('admin.supplier.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.supplier.index') }}">
+                    <i class="fa-solid fa-truck-ramp-box"></i>
+                    <span>সরবরাহকারী (Suppliers)</span>
+                </a>
+            </li>
+
             <!-- Farmers & Hatcheries -->
-            <li class="nav-item has-dropdown">
+            <li class="nav-item has-dropdown {{ request()->routeIs('admin.supplier.*') ? 'open' : '' }}">
                 <div class="dropdown-header">
                     <i class="fa-solid fa-users"></i>
                     <span>খামারি ও হ্যাচারি</span>
@@ -84,7 +92,11 @@
                 </div>
                 <ul class="submenu">
                     <li><a href="#"><i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>খামারি ক্রেতা তালিকা</a></li>
-                    <li><a href="#"><i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>হ্যাচারি সরবরাহকারী</a></li>
+                    <li class="{{ request()->routeIs('admin.supplier.*') ? 'active' : '' }}">
+                        <a href="{{ route('admin.supplier.index') }}" class="{{ request()->routeIs('admin.supplier.*') ? 'text-primary fw-bold' : '' }}">
+                            <i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>হ্যাচারি সরবরাহকারী
+                        </a>
+                    </li>
                 </ul>
             </li>
 

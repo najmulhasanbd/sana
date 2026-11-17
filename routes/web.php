@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\PasswordController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,6 +30,10 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
 
     // Artisan Cache Clear
     Route::get('cache-clear', [AdminController::class, 'clearCache'])->name('admin.cache.clear');
+
+    // Hatchery Suppliers (হ্যাচারি সরবরাহকারী)
+    Route::patch('suppliers/{supplier}/toggle-status', [SupplierController::class, 'toggleStatus'])->name('admin.supplier.toggle-status');
+    Route::resource('suppliers', SupplierController::class)->names('admin.supplier');
 });
 
 Route::middleware('auth')->group(function () {
@@ -36,5 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::redirect('/dashboard', '/admin/dashboard');
 
 require __DIR__.'/auth.php';

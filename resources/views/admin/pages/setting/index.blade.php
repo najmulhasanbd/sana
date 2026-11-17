@@ -3,9 +3,7 @@
 @section('title', 'সিস্টেম ও ব্যবসা সেটিংস')
 
 @section('content')
-    <div class="container-fluid p-3 p-md-4">
-        
-        <!-- Page Header & Breadcrumb -->
+<!-- Page Header & Breadcrumb -->
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
             <div>
                 <h4 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.3px;">
@@ -282,8 +280,6 @@
 
             </form>
         </div>
-
-    </div>
 
 <style>
     .custom-settings-tabs .nav-link {

@@ -1,0 +1,41 @@
+<?php
+
+namespace Database\Factories;
+
+use App\Models\Supplier;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends Factory<Supplier>
+ */
+class SupplierFactory extends Factory
+{
+    protected $model = Supplier::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->company(),
+            'mobile' => '01' . fake()->numerify('#########'),
+            'email' => fake()->unique()->safeEmail(),
+            'address' => fake()->address(),
+            'note' => fake()->sentence(),
+            'status' => true,
+        ];
+    }
+
+    /**
+     * Indicate that the supplier is inactive.
+     */
+    public function inactive(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => false,
+        ]);
+    }
+}

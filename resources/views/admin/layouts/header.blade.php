@@ -14,7 +14,7 @@
            title="Artisan Cache Clear (optimize:clear)"
            style="font-size: 0.8rem; font-weight: 600;">
             <i class="fa-solid fa-broom text-primary"></i>
-            <span class="d-none d-sm-inline">ক্যাশ ক্লিয়ার (Artisan)</span>
+            <span class="d-none d-sm-inline">ক্যাশ ক্লিয়ার</span>
         </a>
 
         <div class="user-profile dropdown">
@@ -22,7 +22,7 @@
                 <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'Admin') }}&background=0284c7&color=fff&bold=true" class="rounded-circle user-img" alt="User" style="width: 38px; height: 38px; object-fit: cover;" />
                 <div class="text-start ms-2 d-none d-md-block">
                     <p class="m-0 fw-bold user-name">
-                        {{ Auth::user()->name ?? 'Mahabub' }}
+                        {{ Auth::user()->name ?? '' }}
                         <i class="fa-solid fa-chevron-down ms-1 dropdown-arrow"></i>
                     </p>
                     <small class="text-muted">Admin</small>

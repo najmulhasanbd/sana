@@ -3,9 +3,7 @@
 @section('title', 'পাসওয়ার্ড পরিবর্তন (Change Password)')
 
 @section('content')
-    <div class="container-fluid p-3 p-md-4">
-        
-        <!-- Page Header & Breadcrumb -->
+<!-- Page Header & Breadcrumb -->
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
             <div>
                 <h4 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.3px;">
@@ -23,10 +21,8 @@
             </nav>
         </div>
 
-        <!-- Main Card -->
-        <div class="row justify-content-center">
-            <div class="col-lg-8 col-xl-7">
-                <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+        <!-- Main Card (Full Width) -->
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white w-100">
                     <div class="card-header bg-white border-bottom p-3 p-md-4 d-flex align-items-center gap-3">
                         <div class="rounded-circle d-flex align-items-center justify-content-center text-white" 
                              style="width: 44px; height: 44px; background: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);">
@@ -158,9 +154,6 @@
                     </form>
                 </div>
             </div>
-        </div>
-
-    </div>
 
 <script>
     function togglePasswordVisibility(inputId, btn) {

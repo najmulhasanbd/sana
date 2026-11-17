@@ -65,43 +65,6 @@
   <!-- Laravel Custom Toastr (najmulhasanbd/laravel-custom-toastr) -->
   <x-custom-toastr position="top-right" duration="4000" />
 
-  @if(session('success'))
-    <script>
-      document.addEventListener("DOMContentLoaded", function() {
-        if (typeof window.customToastr === 'function') {
-          window.customToastr('Success', @json(session('success')), 'সফল');
-        }
-      });
-    </script>
-  @endif
-  @if(session('error'))
-    <script>
-      document.addEventListener("DOMContentLoaded", function() {
-        if (typeof window.customToastr === 'function') {
-          window.customToastr('Error', @json(session('error')), 'ত্রুটি');
-        }
-      });
-    </script>
-  @endif
-  @if(session('warning'))
-    <script>
-      document.addEventListener("DOMContentLoaded", function() {
-        if (typeof window.customToastr === 'function') {
-          window.customToastr('Warning', @json(session('warning')), 'সতর্কতা');
-        }
-      });
-    </script>
-  @endif
-  @if(session('info'))
-    <script>
-      document.addEventListener("DOMContentLoaded", function() {
-        if (typeof window.customToastr === 'function') {
-          window.customToastr('Info', @json(session('info')), 'তথ্য');
-        }
-      });
-    </script>
-  @endif
-
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script src="{{ asset('admin/js/main.js') }}"></script>
 
