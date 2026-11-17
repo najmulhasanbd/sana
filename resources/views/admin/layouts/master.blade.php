@@ -11,6 +11,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Select2 CSS & Bootstrap 5 Theme -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
   <!-- CSRF Token -->
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -26,6 +29,36 @@
 
     .cursor-pointer {
       cursor: pointer;
+    }
+
+    /* Select2 Custom Theme Polish */
+    .select2-container--bootstrap-5 .select2-selection {
+      min-height: 42px;
+      padding: 0.375rem 0.75rem;
+      border: 1px solid #dee2e6;
+      border-radius: 0.5rem;
+      font-size: 0.88rem;
+    }
+    .select2-container--bootstrap-5.select2-container--focus .select2-selection,
+    .select2-container--bootstrap-5.select2-container--open .select2-selection {
+      border-color: #0284c7;
+      box-shadow: 0 0 0 0.2rem rgba(2, 132, 199, 0.15);
+    }
+    .select2-container--bootstrap-5 .select2-dropdown {
+      border-color: #e2e8f0;
+      border-radius: 0.5rem;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      font-size: 0.88rem;
+    }
+    .select2-container--bootstrap-5 .select2-dropdown .select2-search .select2-search__field {
+      border-radius: 0.375rem;
+      border: 1px solid #cbd5e1;
+      padding: 0.4rem 0.75rem;
+      font-size: 0.85rem;
+    }
+    .select2-container--bootstrap-5 .select2-results__option--highlighted[aria-selected] {
+      background-color: #0284c7;
+      color: #fff;
     }
   </style>
 </head>
@@ -61,6 +94,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Select2 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
   <!-- Laravel Custom Toastr (najmulhasanbd/laravel-custom-toastr) -->
   <x-custom-toastr position="top-right" duration="4000" />
@@ -70,6 +105,41 @@
 
   <!-- Global Submit Button Spinner Trait -->
   <x-submit-spinner-script />
+
+  <!-- Global Select2 Initialization -->
+  <script>
+    (function($) {
+      'use strict';
+      window.initSelect2 = function(scope) {
+        var $context = scope ? $(scope) : $(document);
+        $context.find('select.select2, select:not(.no-select2)').each(function() {
+          var $this = $(this);
+          if (!$this.hasClass('select2-hidden-accessible')) {
+            var placeholder = $this.data('placeholder') || $this.attr('placeholder');
+            if (!placeholder) {
+              var $firstOption = $this.find('option[value=""]').first();
+              if ($firstOption.length && $firstOption.text().trim() !== '') {
+                placeholder = $firstOption.text().trim();
+              } else {
+                placeholder = '-- নির্বাচন করুন / Select --';
+              }
+            }
+            $this.select2({
+              theme: 'bootstrap-5',
+              width: '100%',
+              placeholder: placeholder,
+              allowClear: $this.data('allow-clear') !== undefined ? Boolean($this.data('allow-clear')) : true,
+              dropdownParent: $this.closest('.modal').length ? $this.closest('.modal') : $(document.body)
+            });
+          }
+        });
+      };
+
+      $(document).ready(function() {
+        window.initSelect2();
+      });
+    })(jQuery);
+  </script>
 
   @stack('scripts')
 </body>

@@ -42,12 +42,6 @@
                         <span>Password Change</span>
                     </a>
                 </li>
-                <li>
-                    <a href="{{ route('admin.cache.clear') }}">
-                        <i class="fa-solid fa-broom text-primary"></i> 
-                        <span>Clear Cache (Artisan)</span>
-                    </a>
-                </li>
                 <li class="border-top">
                     <form method="POST" action="{{ route('logout') }}" class="m-0">
                         @csrf

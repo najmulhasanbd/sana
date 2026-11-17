@@ -1,9 +1,13 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\DistrictController;
+use App\Http\Controllers\Admin\DivisionController;
+use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\PasswordController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SupplierController;
+use App\Http\Controllers\Admin\ZoneController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +38,19 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
     // Hatchery Suppliers (হ্যাচারি সরবরাহকারী)
     Route::patch('suppliers/{supplier}/toggle-status', [SupplierController::class, 'toggleStatus'])->name('admin.supplier.toggle-status');
     Route::resource('suppliers', SupplierController::class)->names('admin.supplier');
+
+    // Location Management (Division, District, Zone)
+    Route::patch('divisions/{division}/toggle-status', [DivisionController::class, 'toggleStatus'])->name('admin.division.toggle-status');
+    Route::resource('divisions', DivisionController::class)->names('admin.division');
+
+    Route::patch('districts/{district}/toggle-status', [DistrictController::class, 'toggleStatus'])->name('admin.district.toggle-status');
+    Route::resource('districts', DistrictController::class)->names('admin.district');
+
+    Route::patch('zones/{zone}/toggle-status', [ZoneController::class, 'toggleStatus'])->name('admin.zone.toggle-status');
+    Route::resource('zones', ZoneController::class)->names('admin.zone');
+
+    Route::get('locations/districts/{divisionId}', [LocationController::class, 'getDistricts'])->name('admin.locations.districts');
+    Route::get('locations/zones/{districtId}', [LocationController::class, 'getZones'])->name('admin.locations.zones');
 });
 
 Route::middleware('auth')->group(function () {

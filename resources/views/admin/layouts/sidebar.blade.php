@@ -113,14 +113,44 @@
                 </ul>
             </li>
 
+            <!-- Section: Locations (বিভাগ, জেলা, জোন) -->
+            <li class="nav-section-title px-4 pt-3 pb-1 text-uppercase text-muted" style="font-size: 0.68rem; font-weight: 700; letter-spacing: 0.5px; opacity: 0.75;">
+                লোকেশন ও অঞ্চল
+            </li>
+
+            <li class="nav-item has-dropdown {{ request()->routeIs('admin.division.*') || request()->routeIs('admin.district.*') || request()->routeIs('admin.zone.*') ? 'open' : '' }}">
+                <div class="dropdown-header">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    <span>লোকেশন ম্যানেজমেন্ট</span>
+                    <i class="fa-solid fa-chevron-right arrow"></i>
+                </div>
+                <ul class="submenu">
+                    <li class="{{ request()->routeIs('admin.division.*') ? 'active' : '' }}">
+                        <a href="{{ route('admin.division.index') }}" class="{{ request()->routeIs('admin.division.*') ? 'text-primary fw-bold' : '' }}">
+                            <i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>বিভাগ (Divisions)
+                        </a>
+                    </li>
+                    <li class="{{ request()->routeIs('admin.district.*') ? 'active' : '' }}">
+                        <a href="{{ route('admin.district.index') }}" class="{{ request()->routeIs('admin.district.*') ? 'text-primary fw-bold' : '' }}">
+                            <i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>জেলা (Districts)
+                        </a>
+                    </li>
+                    <li class="{{ request()->routeIs('admin.zone.*') ? 'active' : '' }}">
+                        <a href="{{ route('admin.zone.index') }}" class="{{ request()->routeIs('admin.zone.*') ? 'text-primary fw-bold' : '' }}">
+                            <i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>জোন / উপজেলা (Zones)
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <!-- Section: System -->
             <li class="nav-section-title px-4 pt-3 pb-1 text-uppercase text-muted" style="font-size: 0.68rem; font-weight: 700; letter-spacing: 0.5px; opacity: 0.75;">
                 সিস্টেম
             </li>
 
             <!-- Settings Link -->
-            <li class="nav-item {{ request()->routeIs('setting.*') ? 'active' : '' }}">
-                <a href="{{ route('setting.index') }}">
+            <li class="nav-item {{ request()->routeIs('setting.*') || request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.settings.index') }}">
                     <i class="fa-solid fa-sliders"></i>
                     <span>সিস্টেম সেটিংস (Settings)</span>
                 </a>
