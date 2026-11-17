@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DistrictController;
 use App\Http\Controllers\Admin\DivisionController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\PasswordController;
+use App\Http\Controllers\Admin\PurchaseProductController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\ZoneController;
@@ -38,6 +39,9 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
     // Hatchery Suppliers (হ্যাচারি সরবরাহকারী)
     Route::patch('suppliers/{supplier}/toggle-status', [SupplierController::class, 'toggleStatus'])->name('admin.supplier.toggle-status');
     Route::resource('suppliers', SupplierController::class)->names('admin.supplier');
+
+    // Purchase Products (ক্রয় পণ্য তালিকা - Modal CRUD)
+    Route::resource('purchase-products', PurchaseProductController::class)->only(['index', 'store', 'update', 'destroy'])->names('admin.purchase-product');
 
     // Location Management (Division, District, Zone)
     Route::patch('divisions/{division}/toggle-status', [DivisionController::class, 'toggleStatus'])->name('admin.division.toggle-status');

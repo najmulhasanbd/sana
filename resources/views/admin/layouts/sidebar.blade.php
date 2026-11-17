@@ -83,6 +83,14 @@
                 </a>
             </li>
 
+            <!-- Purchase Products (Direct Top-Level Menu for Quick Access) -->
+            <li class="nav-item {{ request()->routeIs('admin.purchase-product.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.purchase-product.index') }}">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                    <span>ক্রয় পণ্য</span>
+                </a>
+            </li>
+
             <!-- Farmers & Hatcheries -->
             <li class="nav-item has-dropdown {{ request()->routeIs('admin.supplier.*') ? 'open' : '' }}">
                 <div class="dropdown-header">
@@ -127,17 +135,17 @@
                 <ul class="submenu">
                     <li class="{{ request()->routeIs('admin.division.*') ? 'active' : '' }}">
                         <a href="{{ route('admin.division.index') }}" class="{{ request()->routeIs('admin.division.*') ? 'text-primary fw-bold' : '' }}">
-                            <i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>বিভাগ (Divisions)
+                            <i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>বিভাগ 
                         </a>
                     </li>
                     <li class="{{ request()->routeIs('admin.district.*') ? 'active' : '' }}">
                         <a href="{{ route('admin.district.index') }}" class="{{ request()->routeIs('admin.district.*') ? 'text-primary fw-bold' : '' }}">
-                            <i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>জেলা (Districts)
+                            <i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>জেলা 
                         </a>
                     </li>
                     <li class="{{ request()->routeIs('admin.zone.*') ? 'active' : '' }}">
                         <a href="{{ route('admin.zone.index') }}" class="{{ request()->routeIs('admin.zone.*') ? 'text-primary fw-bold' : '' }}">
-                            <i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>জোন / উপজেলা (Zones)
+                            <i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>জোন / উপজেলা 
                         </a>
                     </li>
                 </ul>
