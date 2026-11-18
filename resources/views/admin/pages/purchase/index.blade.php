@@ -155,10 +155,11 @@
             <table class="table align-middle mb-0 table-hover">
                 <thead class="bg-light table-light">
                     <tr>
-                        <th class="ps-4 py-3 text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem; width: 60px;">#</th>
+                        <th class="ps-4 py-3 text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem; width: 60px;">SL</th>
                         <th class="py-3 text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem;">চালান নম্বর</th>
                         <th class="py-3 text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem;">তারিখ</th>
                         <th class="py-3 text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem;">সরবরাহকারী</th>
+                        <th class="py-3 text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem;">পণ্যসমূহ</th>
                         <th class="py-3 text-secondary text-uppercase fw-semibold text-end" style="font-size: 0.75rem;">মোট মূল্য</th>
                         <th class="py-3 text-secondary text-uppercase fw-semibold text-end" style="font-size: 0.75rem;">পরিশোধিত</th>
                         <th class="py-3 text-secondary text-uppercase fw-semibold text-end" style="font-size: 0.75rem;">বকেয়া</th>
@@ -182,6 +183,22 @@
                                 <span class="text-muted small">
                                     {{ $purchase->purchase_date ? $purchase->purchase_date->format('d M, Y') : '—' }}
                                 </span>
+                            </td>
+                            <td>
+                                @php
+                                    $productNames = $purchase->items->map(fn($i) => $i->product?->name)->filter();
+                                @endphp
+                                @if($productNames->isEmpty())
+                                    <span class="text-muted small">—</span>
+                                @else
+                                    <div class="d-flex flex-wrap gap-1">
+                                        @foreach($productNames as $pName)
+                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-semibold px-2 py-1" style="font-size: 0.72rem;">
+                                                🐟 {{ $pName }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                @endif
                             </td>
                             <td>
                                 <div>

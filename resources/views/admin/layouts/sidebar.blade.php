@@ -7,8 +7,8 @@
                 <i class="fa-solid fa-fish fs-5"></i>
             </div>
             <div class="logo-text text-start overflow-hidden">
-                <h6 class="m-0 fw-bold text-white tracking-wide text-truncate" style="font-size: 1.05rem; letter-spacing: -0.2px;">সানা ফিশারিজ</h6>
-                <small class="text-cyan-400 d-block text-truncate" style="font-size: 0.72rem; color: #38bdf8 !important;">মাছের ছানা ও পোনা বাজার</small>
+                <h6 class="m-0 fw-bold text-white tracking-wide text-truncate" style="font-size: 1.05rem; letter-spacing: -0.2px;">Sana Fisheries</h6>
+                <small class="text-cyan-400 d-block text-truncate" style="font-size: 0.72rem; color: #38bdf8 !important;">Fish Fry & Hatchery Hub</small>
             </div>
         </a>
     </div>
@@ -20,85 +20,101 @@
             <li class="nav-item {{ request()->routeIs('admin.dashboard') || request()->routeIs('dashboard') ? 'active' : '' }}">
                 <a href="{{ route('admin.dashboard') }}">
                     <i class="fa-solid fa-house-chimney"></i>
-                    <span>ড্যাশবোর্ড</span>
+                    <span>Dashboard</span>
                 </a>
             </li>
 
             <!-- Section: Hatchery & Stock -->
-            <li class="nav-section-title px-4 pt-3 pb-1 text-uppercase text-muted" style="font-size: 0.68rem; font-weight: 700; letter-spacing: 0.5px; opacity: 0.75;">
-                মৎস্য ও হ্যাচারি
-            </li>
+            <!-- <li class="nav-section-title px-4 pt-3 pb-1 text-uppercase text-muted" style="font-size: 0.68rem; font-weight: 700; letter-spacing: 0.5px; opacity: 0.75;">
+                Fish & Hatchery
+            </li> -->
 
             <!-- Fish Fry Stock -->
-            <li class="nav-item has-dropdown">
+            <!-- <li class="nav-item has-dropdown">
                 <div class="dropdown-header">
                     <i class="fa-solid fa-fish-fins"></i>
-                    <span>মাছের ছানা ও স্টক</span>
+                    <span>Fish Fry & Stock</span>
                     <i class="fa-solid fa-chevron-right arrow"></i>
                 </div>
                 <ul class="submenu">
-                    <li><a href="#"><i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>সকল পোনার স্টক</a></li>
-                    <li><a href="#"><i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>নতুন পোনা ব্যাচ যোগ</a></li>
-                    <li><a href="#"><i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>জাত ও সাইজ ক্যাটাগরি</a></li>
+                    <li><a href="#"></i>All Fry Stock</a></li>
+                    <li><a href="#"></i>Add New Batch</a></li>
+                    <li><a href="#"></i>Species & Sizes</a></li>
                 </ul>
-            </li>
+            </li> -->
 
             <!-- Orders & Sales -->
-            <li class="nav-item has-dropdown">
+            <!-- <li class="nav-item has-dropdown">
                 <div class="dropdown-header">
                     <i class="fa-solid fa-cart-shopping"></i>
-                    <span>অর্ডার ও বিক্রয়</span>
+                    <span>Orders & Sales</span>
                     <i class="fa-solid fa-chevron-right arrow"></i>
                 </div>
                 <ul class="submenu">
-                    <li><a href="#"><i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>সকল অর্ডার তালিকা</a></li>
-                    <li><a href="#"><i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>অপেক্ষমাণ চালান (Pending)</a></li>
-                    <li><a href="#"><i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>সম্পন্ন চালান (Delivered)</a></li>
+                    <li><a href="#"></i>All Orders</a></li>
+                    <li><a href="#"></i>Pending Orders</a></li>
+                    <li><a href="#"></i>Delivered Orders</a></li>
                 </ul>
-            </li>
+            </li> -->
 
             <!-- Delivery & Transport -->
-            <li class="nav-item has-dropdown">
+            <!-- <li class="nav-item has-dropdown">
                 <div class="dropdown-header">
                     <i class="fa-solid fa-truck-fast"></i>
-                    <span>ডেলিভারি ও চালান</span>
+                    <span>Delivery & Transport</span>
                     <i class="fa-solid fa-chevron-right arrow"></i>
                 </div>
                 <ul class="submenu">
-                    <li><a href="#"><i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>অক্সিজেন প্যাক ট্র্যাকিং</a></li>
-                    <li><a href="#"><i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>পরিবহন হিসাব</a></li>
+                    <li><a href="#"></i>Oxygen Pack Tracking</a></li>
+                    <li><a href="#"></i>Transport Cost</a></li>
                 </ul>
-            </li>
+            </li> -->
 
             <!-- Section: Parties & Accounts -->
-            <li class="nav-section-title px-4 pt-3 pb-1 text-uppercase text-muted" style="font-size: 0.68rem; font-weight: 700; letter-spacing: 0.5px; opacity: 0.75;">
-                পার্টনার ও হিসাব
-            </li>
+            <!-- <li class="nav-section-title px-4 pt-3 pb-1 text-uppercase text-muted" style="font-size: 0.68rem; font-weight: 700; letter-spacing: 0.5px; opacity: 0.75;">
+                Partners & Accounts
+            </li> -->
 
             <!-- Suppliers (Direct Top-Level Menu for Quick Access) -->
             <li class="nav-item {{ request()->routeIs('admin.supplier.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.supplier.index') }}">
                     <i class="fa-solid fa-truck-ramp-box"></i>
-                    <span>সরবরাহকারী</span>
+                    <span>Suppliers</span>
                 </a>
             </li>
 
-            <!-- Purchase Management (পণ্য ক্রয় ও হিসাব) -->
+            <!-- Purchase Management -->
             <li class="nav-item has-dropdown {{ request()->routeIs('admin.purchase.*') || request()->routeIs('admin.purchase-product.*') ? 'open' : '' }}">
                 <div class="dropdown-header">
                     <i class="fa-solid fa-cart-flatbed"></i>
-                    <span>ক্রয় ব্যবস্থাপনা (Purchase)</span>
+                    <span>Purchase Management</span>
                     <i class="fa-solid fa-chevron-right arrow"></i>
                 </div>
                 <ul class="submenu">
                     <li class="{{ request()->routeIs('admin.purchase.index') ? 'active' : '' }}">
                         <a href="{{ route('admin.purchase.index') }}" class="{{ request()->routeIs('admin.purchase.index') ? 'text-primary fw-bold' : '' }}">
-                            <i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>সকল ক্রয়ের তালিকা
+                            All Purchases
                         </a>
                     </li>
                     <li class="{{ request()->routeIs('admin.purchase-product.*') ? 'active' : '' }}">
                         <a href="{{ route('admin.purchase-product.index') }}" class="{{ request()->routeIs('admin.purchase-product.*') ? 'text-primary fw-bold' : '' }}">
-                            <i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>ক্রয় পণ্য তালিকা
+                            Purchase Products
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Sales Management -->
+            <li class="nav-item has-dropdown {{ request()->routeIs('admin.sale-product.*') ? 'open' : '' }}">
+                <div class="dropdown-header">
+                    <i class="fa-solid fa-boxes-packing"></i>
+                    <span>Sales Management</span>
+                    <i class="fa-solid fa-chevron-right arrow"></i>
+                </div>
+                <ul class="submenu">
+                    <li class="{{ request()->routeIs('admin.sale-product.*') ? 'active' : '' }}">
+                        <a href="{{ route('admin.sale-product.index') }}" class="{{ request()->routeIs('admin.sale-product.*') ? 'text-primary fw-bold' : '' }}">
+                            Sale Products
                         </a>
                     </li>
                 </ul>
@@ -108,57 +124,52 @@
             <li class="nav-item has-dropdown {{ request()->routeIs('admin.supplier.*') ? 'open' : '' }}">
                 <div class="dropdown-header">
                     <i class="fa-solid fa-users"></i>
-                    <span>খামারি ও হ্যাচারি</span>
+                    <span>Farmers & Hatcheries</span>
                     <i class="fa-solid fa-chevron-right arrow"></i>
                 </div>
                 <ul class="submenu">
-                    <li><a href="#"><i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>খামারি ক্রেতা তালিকা</a></li>
+                    <li><a href="#"></i>Farmer Clients</a></li>
                     <li class="{{ request()->routeIs('admin.supplier.*') ? 'active' : '' }}">
                         <a href="{{ route('admin.supplier.index') }}" class="{{ request()->routeIs('admin.supplier.*') ? 'text-primary fw-bold' : '' }}">
-                            <i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>হ্যাচারি সরবরাহকারী
+                            </i>Hatchery Suppliers
                         </a>
                     </li>
                 </ul>
             </li>
 
             <!-- Accounts & Billing -->
-            <li class="nav-item has-dropdown">
+            <!-- <li class="nav-item has-dropdown">
                 <div class="dropdown-header">
                     <i class="fa-solid fa-file-invoice-dollar"></i>
-                    <span>হিসাব ও লেনদেন</span>
+                    <span>Accounts & Finance</span>
                     <i class="fa-solid fa-chevron-right arrow"></i>
                 </div>
                 <ul class="submenu">
-                    <li><a href="#"><i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>দৈনিক ক্যাশ হিসাব</a></li>
-                    <li><a href="#"><i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>বকেয়া ও কালেকশন</a></li>
+                    <li><a href="#"></i>Daily Cash Book</a></li>
+                    <li><a href="#"></i>Due & Collections</a></li>
                 </ul>
-            </li>
-
-            <!-- Section: Locations (বিভাগ, জেলা, জোন) -->
-            <li class="nav-section-title px-4 pt-3 pb-1 text-uppercase text-muted" style="font-size: 0.68rem; font-weight: 700; letter-spacing: 0.5px; opacity: 0.75;">
-                লোকেশন ও অঞ্চল
-            </li>
+            </li> -->
 
             <li class="nav-item has-dropdown {{ request()->routeIs('admin.division.*') || request()->routeIs('admin.district.*') || request()->routeIs('admin.zone.*') ? 'open' : '' }}">
                 <div class="dropdown-header">
                     <i class="fa-solid fa-map-location-dot"></i>
-                    <span>লোকেশন ম্যানেজমেন্ট</span>
+                    <span>Location Management</span>
                     <i class="fa-solid fa-chevron-right arrow"></i>
                 </div>
                 <ul class="submenu">
                     <li class="{{ request()->routeIs('admin.division.*') ? 'active' : '' }}">
                         <a href="{{ route('admin.division.index') }}" class="{{ request()->routeIs('admin.division.*') ? 'text-primary fw-bold' : '' }}">
-                            <i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>বিভাগ 
+                            </i>Divisions
                         </a>
                     </li>
                     <li class="{{ request()->routeIs('admin.district.*') ? 'active' : '' }}">
                         <a href="{{ route('admin.district.index') }}" class="{{ request()->routeIs('admin.district.*') ? 'text-primary fw-bold' : '' }}">
-                            <i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>জেলা 
+                            </i>Districts
                         </a>
                     </li>
                     <li class="{{ request()->routeIs('admin.zone.*') ? 'active' : '' }}">
                         <a href="{{ route('admin.zone.index') }}" class="{{ request()->routeIs('admin.zone.*') ? 'text-primary fw-bold' : '' }}">
-                            <i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>জোন / উপজেলা 
+                            </i>Zones / Upazilas
                         </a>
                     </li>
                 </ul>
@@ -166,31 +177,9 @@
 
             <!-- Section: System -->
             <li class="nav-section-title px-4 pt-3 pb-1 text-uppercase text-muted" style="font-size: 0.68rem; font-weight: 700; letter-spacing: 0.5px; opacity: 0.75;">
-                সিস্টেম
-            </li>
-
-            <!-- Settings Link -->
-            <li class="nav-item {{ request()->routeIs('setting.*') || request()->routeIs('admin.settings.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.settings.index') }}">
-                    <i class="fa-solid fa-sliders"></i>
-                    <span>সিস্টেম সেটিংস</span>
-                </a>
+                System
             </li>
         </ul>
-    </div>
-
-    <!-- Sidebar Bottom Status Footer -->
-    <div class="sidebar-footer p-3 mt-auto border-top border-secondary border-opacity-25">
-        <div class="p-2.5 rounded-3 d-flex align-items-center gap-2" style="background: rgba(255, 255, 255, 0.05);">
-            <div class="position-relative flex-shrink-0">
-                <div class="rounded-circle bg-success" style="width: 10px; height: 10px;"></div>
-                <div class="position-absolute top-0 start-0 rounded-circle bg-success animate-ping" style="width: 10px; height: 10px; opacity: 0.75;"></div>
-            </div>
-            <div class="overflow-hidden">
-                <small class="text-white d-block fw-semibold text-truncate" style="font-size: 0.78rem;">হ্যাচারি ডাটাবেজ সচল</small>
-                <small class="text-muted d-block text-truncate" style="font-size: 0.68rem;">v২.০ • নিরাপদ সিস্টেম</small>
-            </div>
-        </div>
     </div>
 </aside>
 
