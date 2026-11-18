@@ -41,6 +41,26 @@ test('user can save settings and image is converted to webp', function () {
     @unlink(public_path($logoPath));
 });
 
+test('user can save memo and challan settings', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->post(route('setting.store'), [
+        'memo_business_name' => 'মেসার্স সানা ফিস নার্সিং',
+        'proprietor_name' => 'নজরুল ইসলাম',
+        'proprietor_mobile' => '01700112233',
+        'operator_name' => 'মোমিনুর',
+        'nursing_point_address' => 'শ্রীউলা, আশাশুনি',
+        'office_address' => 'বাল্লা বাজার, আশাশুনি',
+        'memo_slogan' => 'সততাই ব্যবসার মূল লক্ষ্য',
+    ]);
+
+    $response->assertRedirect(route('setting.index'));
+
+    expect(Setting::get('memo_business_name'))->toBe('মেসার্স সানা ফিস নার্সিং');
+    expect(Setting::get('proprietor_name'))->toBe('নজরুল ইসলাম');
+    expect(Setting::get('nursing_point_address'))->toBe('শ্রীউলা, আশাশুনি');
+});
+
 test('authenticated user can view password change page', function () {
     $user = User::factory()->create();
 

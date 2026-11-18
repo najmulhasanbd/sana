@@ -105,7 +105,7 @@
             </li>
 
             <!-- Sales Management -->
-            <li class="nav-item has-dropdown {{ request()->routeIs('admin.sales.*') || request()->routeIs('admin.sale-product.*') ? 'open' : '' }}">
+            <li class="nav-item has-dropdown {{ request()->routeIs('admin.sales.*') || request()->routeIs('admin.sale-product.*') || request()->routeIs('admin.customer.*') || request()->routeIs('admin.customer-due.*') ? 'open' : '' }}">
                 <div class="dropdown-header">
                     <i class="fa-solid fa-boxes-packing"></i>
                     <span>Sales Management</span>
@@ -117,9 +117,14 @@
                             All Sales
                         </a>
                     </li>
-                    <li class="{{ request()->routeIs('admin.sales.create') ? 'active' : '' }}">
-                        <a href="{{ route('admin.sales.create') }}" class="{{ request()->routeIs('admin.sales.create') ? 'text-primary fw-bold' : '' }}">
-                            New Sale
+                    <li class="{{ request()->routeIs('admin.customer-due.*') ? 'active' : '' }}">
+                        <a href="{{ route('admin.customer-due.index') }}" class="{{ request()->routeIs('admin.customer-due.*') ? 'text-primary fw-bold' : '' }}">
+                            Customer Due Sheet
+                        </a>
+                    </li>
+                    <li class="{{ request()->routeIs('admin.customer.*') ? 'active' : '' }}">
+                        <a href="{{ route('admin.customer.index') }}" class="{{ request()->routeIs('admin.customer.*') ? 'text-primary fw-bold' : '' }}">
+                            Customers
                         </a>
                     </li>
                     <li class="{{ request()->routeIs('admin.sale-product.*') ? 'active' : '' }}">

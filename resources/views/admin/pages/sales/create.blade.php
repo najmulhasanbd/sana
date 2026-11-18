@@ -77,8 +77,9 @@
                                                 data-district="{{ $customer->district_id }}"
                                                 data-zone="{{ $customer->zone_id }}"
                                                 data-address="{{ $customer->address }}"
+                                                data-due="{{ (float)($customer->total_due ?? 0) }}"
                                                 data-location="{{ collect([$customer->zone?->name, $customer->district?->name])->filter()->implode(', ') }}">
-                                            {{ $customer->name }} — {{ $customer->mobile }} {{ $customer->district ? "({$customer->district->name})" : '' }}
+                                            {{ $customer->name }} — {{ $customer->mobile }} {{ $customer->district ? "({$customer->district->name})" : '' }} {{ ($customer->total_due ?? 0) > 0 ? '(বকেয়া: ৳' . number_format($customer->total_due, 2) . ')' : '' }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -223,25 +224,28 @@
                             <table class="table align-middle mb-0" id="itemsTable">
                                 <thead class="bg-light table-light">
                                     <tr>
-                                        <th class="ps-4 py-3 text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem; width: 38%;">পণ্য নির্বাচন (Product) <span class="text-danger">*</span></th>
-                                        <th class="py-3 text-secondary text-uppercase fw-semibold text-center" style="font-size: 0.75rem; width: 18%;">পরিমাণ (Qty) <span class="text-danger">*</span></th>
-                                        <th class="py-3 text-secondary text-uppercase fw-semibold text-center" style="font-size: 0.75rem; width: 14%;">একক (Unit) <span class="text-danger">*</span></th>
-                                        <th class="py-3 text-secondary text-uppercase fw-semibold text-center" style="font-size: 0.75rem; width: 16%;">দর (৳) <span class="text-danger">*</span></th>
-                                        <th class="py-3 text-secondary text-uppercase fw-semibold text-end" style="font-size: 0.75rem; width: 14%;">মোট (৳)</th>
-                                        <th class="pe-4 py-3 text-center" style="width: 50px;"></th>
+                                        <th class="ps-4 py-3 text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem; width: 25%;">ব্র্যান্ড / পণ্য নির্বাচন <span class="text-danger">*</span></th>
+                                        <th class="py-3 text-secondary text-uppercase fw-semibold text-center" style="font-size: 0.75rem; width: 9%;">বক্স</th>
+                                        <th class="py-3 text-secondary text-uppercase fw-semibold text-center" style="font-size: 0.75rem; width: 9%;">পলি</th>
+                                        <th class="py-3 text-secondary text-uppercase fw-semibold text-center" style="font-size: 0.75rem; width: 9%;">মীর</th>
+                                        <th class="py-3 text-secondary text-uppercase fw-semibold text-center" style="font-size: 0.75rem; width: 15%;">মোট পোনা (Qty) <span class="text-danger">*</span></th>
+                                        <th class="py-3 text-secondary text-uppercase fw-semibold text-center" style="font-size: 0.75rem; width: 11%;">একক</th>
+                                        <th class="py-3 text-secondary text-uppercase fw-semibold text-center" style="font-size: 0.75rem; width: 11%;">দর (৳) <span class="text-danger">*</span></th>
+                                        <th class="py-3 text-secondary text-uppercase fw-semibold text-end" style="font-size: 0.75rem; width: 11%;">মোট (৳)</th>
+                                        <th class="pe-4 py-3 text-center" style="width: 45px;"></th>
                                     </tr>
                                 </thead>
                                 <tbody id="itemsTableBody">
                                     @php
                                         $oldItems = old('items', [
-                                            ['sale_product_id' => '', 'quantity' => '', 'unit' => 'কেজি', 'unit_price' => '']
+                                            ['sale_product_id' => '', 'box' => '', 'poly' => '', 'meer' => '', 'quantity' => '', 'unit' => 'পিস', 'unit_price' => '']
                                         ]);
                                     @endphp
                                     @foreach($oldItems as $idx => $item)
                                         <tr class="item-row">
                                             <td class="ps-4">
-                                                <select name="items[{{ $idx }}][sale_product_id]" class="form-select product-select" data-placeholder="-- বিক্রয় পণ্য নির্বাচন করুন --" required>
-                                                    <option value="">-- বিক্রয় পণ্য নির্বাচন করুন --</option>
+                                                <select name="items[{{ $idx }}][sale_product_id]" class="form-select product-select" data-placeholder="-- পণ্য নির্বাচন করুন --" required>
+                                                    <option value="">-- পণ্য নির্বাচন করুন --</option>
                                                     @foreach($products as $prod)
                                                         <option value="{{ $prod->id }}" {{ (string)($item['sale_product_id'] ?? '') === (string)$prod->id ? 'selected' : '' }}>
                                                             {{ $prod->name }}
@@ -250,24 +254,47 @@
                                                 </select>
                                             </td>
                                             <td>
+                                                <input type="text" 
+                                                       name="items[{{ $idx }}][box]" 
+                                                       value="{{ $item['box'] ?? '' }}"
+                                                       class="form-control text-center" 
+                                                       placeholder="বক্স" 
+                                                       style="font-size: 0.85rem;">
+                                            </td>
+                                            <td>
+                                                <input type="text" 
+                                                       name="items[{{ $idx }}][poly]" 
+                                                       value="{{ $item['poly'] ?? '' }}"
+                                                       class="form-control text-center" 
+                                                       placeholder="পলি" 
+                                                       style="font-size: 0.85rem;">
+                                            </td>
+                                            <td>
+                                                <input type="text" 
+                                                       name="items[{{ $idx }}][meer]" 
+                                                       value="{{ $item['meer'] ?? '' }}"
+                                                       class="form-control text-center" 
+                                                       placeholder="মীর" 
+                                                       style="font-size: 0.85rem;">
+                                            </td>
+                                            <td>
                                                 <input type="number" 
                                                        name="items[{{ $idx }}][quantity]" 
                                                        value="{{ $item['quantity'] ?? '' }}"
                                                        class="form-control text-center item-qty" 
                                                        step="0.01" 
                                                        min="0.01" 
-                                                       placeholder="0.00" 
+                                                       placeholder="0" 
                                                        required 
                                                        style="font-size: 0.88rem;">
                                             </td>
                                             <td>
                                                 <select name="items[{{ $idx }}][unit]" class="form-select form-select-sm text-center" style="font-size: 0.85rem;" required>
-                                                    <option value="কেজি" {{ ($item['unit'] ?? '') === 'কেজি' ? 'selected' : '' }}>কেজি (Kg)</option>
-                                                    <option value="পিস" {{ ($item['unit'] ?? '') === 'পিস' ? 'selected' : '' }}>পিস (Pcs)</option>
-                                                    <option value="মণ" {{ ($item['unit'] ?? '') === 'মণ' ? 'selected' : '' }}>মণ (Mon)</option>
-                                                    <option value="গ্রাম" {{ ($item['unit'] ?? '') === 'গ্রাম' ? 'selected' : '' }}>গ্রাম (Gram)</option>
-                                                    <option value="ড্রাম" {{ ($item['unit'] ?? '') === 'ড্রাম' ? 'selected' : '' }}>ড্রাম (Drum)</option>
-                                                    <option value="খাঁচা" {{ ($item['unit'] ?? '') === 'খাঁচা' ? 'selected' : '' }}>খাঁচা (Crate)</option>
+                                                    <option value="পিস" {{ ($item['unit'] ?? '') === 'পিস' ? 'selected' : '' }}>পিস</option>
+                                                    <option value="কেজি" {{ ($item['unit'] ?? '') === 'কেজি' ? 'selected' : '' }}>কেজি</option>
+                                                    <option value="মণ" {{ ($item['unit'] ?? '') === 'মণ' ? 'selected' : '' }}>মণ</option>
+                                                    <option value="গ্রাম" {{ ($item['unit'] ?? '') === 'গ্রাম' ? 'selected' : '' }}>গ্রাম</option>
+                                                    <option value="ড্রাম" {{ ($item['unit'] ?? '') === 'ড্রাম' ? 'selected' : '' }}>ড্রাম</option>
                                                     <option value="অন্যান্য" {{ ($item['unit'] ?? '') === 'অন্যান্য' ? 'selected' : '' }}>অন্যান্য</option>
                                                 </select>
                                             </td>
@@ -692,10 +719,31 @@ $(document).ready(function() {
         const newRowHtml = `
             <tr class="item-row">
                 <td class="ps-4">
-                    <select name="items[${rowIndex}][sale_product_id]" class="form-select product-select" data-placeholder="-- বিক্রয় পণ্য নির্বাচন করুন --" required>
-                        <option value="">-- বিক্রয় পণ্য নির্বাচন করুন --</option>
+                    <select name="items[${rowIndex}][sale_product_id]" class="form-select product-select" data-placeholder="-- পণ্য নির্বাচন করুন --" required>
+                        <option value="">-- পণ্য নির্বাচন করুন --</option>
                         ${productOptionsHtml}
                     </select>
+                </td>
+                <td>
+                    <input type="text" 
+                           name="items[${rowIndex}][box]" 
+                           class="form-control text-center" 
+                           placeholder="বক্স" 
+                           style="font-size: 0.85rem;">
+                </td>
+                <td>
+                    <input type="text" 
+                           name="items[${rowIndex}][poly]" 
+                           class="form-control text-center" 
+                           placeholder="পলি" 
+                           style="font-size: 0.85rem;">
+                </td>
+                <td>
+                    <input type="text" 
+                           name="items[${rowIndex}][meer]" 
+                           class="form-control text-center" 
+                           placeholder="মীর" 
+                           style="font-size: 0.85rem;">
                 </td>
                 <td>
                     <input type="number" 
@@ -703,18 +751,17 @@ $(document).ready(function() {
                            class="form-control text-center item-qty" 
                            step="0.01" 
                            min="0.01" 
-                           placeholder="0.00" 
+                           placeholder="0" 
                            required 
                            style="font-size: 0.88rem;">
                 </td>
                 <td>
                     <select name="items[${rowIndex}][unit]" class="form-select form-select-sm text-center" style="font-size: 0.85rem;" required>
-                        <option value="কেজি" selected>কেজি (Kg)</option>
-                        <option value="পিস">পিস (Pcs)</option>
-                        <option value="মণ">মণ (Mon)</option>
-                        <option value="গ্রাম">গ্রাম (Gram)</option>
-                        <option value="ড্রাম">ড্রাম (Drum)</option>
-                        <option value="খাঁচা">খাঁচা (Crate)</option>
+                        <option value="পিস" selected>পিস</option>
+                        <option value="কেজি">কেজি</option>
+                        <option value="মণ">মণ</option>
+                        <option value="গ্রাম">গ্রাম</option>
+                        <option value="ড্রাম">ড্রাম</option>
                         <option value="অন্যান্য">অন্যান্য</option>
                     </select>
                 </td>

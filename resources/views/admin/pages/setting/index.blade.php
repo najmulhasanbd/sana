@@ -72,6 +72,15 @@
                                 <span>যোগাযোগ ও ঠিকানা</span>
                             </button>
                         </li>
+
+                        <!-- Tab 4: Memo & Challan Settings -->
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link rounded-pill px-3 py-2 fw-semibold d-flex align-items-center gap-2" 
+                                    id="memo-tab" data-bs-toggle="pill" data-bs-target="#memo-pane" type="button" role="tab">
+                                <i class="fa-solid fa-receipt"></i>
+                                <span>মেমো ও চালান সেটিংস</span>
+                            </button>
+                        </li>
                     </ul>
                 </div>
 
@@ -254,6 +263,132 @@
                                         <textarea class="form-control border-start-0 ps-0" id="address" name="address" rows="2" 
                                                   placeholder="অফিস বা হ্যাচারির পূর্ণাঙ্গ ঠিকানা লিখুন">{{ $settings['address'] ?? '' }}</textarea>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB 4: Memo & Challan Settings -->
+                        <div class="tab-pane fade" id="memo-pane" role="tabpanel">
+                            <div class="row g-3 g-md-4">
+                                <div class="col-12 border-bottom pb-2 mb-2">
+                                    <h6 class="fw-bold text-dark m-0">প্রিন্ট মেমো ও চালান সেটিংস</h6>
+                                    <small class="text-muted">A4 মেমো প্যাডের হেডার, প্রোপাইটার, মোবাইল, ঠিকানা ও ফুটারে প্রদর্শিত সকল তথ্য এখান থেকে নিয়ন্ত্রণ করুন</small>
+                                </div>
+
+                                <!-- Memo Business Title -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-secondary" for="memo_business_name">
+                                        মেমোর প্রধান নাম (Company Name on Memo)
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-file-invoice"></i></span>
+                                        <input type="text" class="form-control border-start-0 ps-0" id="memo_business_name" name="memo_business_name" 
+                                               value="{{ $settings['memo_business_name'] ?? 'মেসার্স সানা ফিস এন্ড নার্সিং পয়েন্ট' }}" placeholder="যেমন: মেসার্স সানা ফিস এন্ড নার্সিং পয়েন্ট">
+                                    </div>
+                                </div>
+
+                                <!-- Subtitle / Tagline -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-secondary" for="memo_subtitle">
+                                        মেমোর সাবটাইটেল (Subtitle / Tagline)
+                                    </label>
+                                    <input type="text" class="form-control" id="memo_subtitle" name="memo_subtitle" 
+                                           value="{{ $settings['memo_subtitle'] ?? 'এখানে সকল প্রকার বাগদার পোনা নার্সিং করা হয় ও বিক্রয়ের নির্ভরযোগ্য প্রতিষ্ঠান।' }}" 
+                                           placeholder="যেমন: এখানে সকল প্রকার বাগদার পোনা নার্সিং করা হয়...">
+                                </div>
+
+                                <!-- Proprietor Name -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-secondary" for="proprietor_name">
+                                        প্রোপাইটারের নাম
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-user-tie"></i></span>
+                                        <input type="text" class="form-control border-start-0 ps-0" id="proprietor_name" name="proprietor_name" 
+                                               value="{{ $settings['proprietor_name'] ?? 'আলহাজ্ব নজরুল ইসলাম সানা' }}" placeholder="যেমন: আলহাজ্ব নজরুল ইসলাম সানা">
+                                    </div>
+                                </div>
+
+                                <!-- Proprietor Mobile -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-secondary" for="proprietor_mobile">
+                                        প্রোপাইটারের মোবাইল নম্বর
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-phone"></i></span>
+                                        <input type="text" class="form-control border-start-0 ps-0" id="proprietor_mobile" name="proprietor_mobile" 
+                                               value="{{ $settings['proprietor_mobile'] ?? '01737 908309' }}" placeholder="যেমন: 01737 908309">
+                                    </div>
+                                </div>
+
+                                <!-- Additional Contact Numbers -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-secondary" for="contact_numbers">
+                                        অন্যান্য যোগাযোগ নম্বরসমূহ (Contacts)
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-address-book"></i></span>
+                                        <input type="text" class="form-control border-start-0 ps-0" id="contact_numbers" name="contact_numbers" 
+                                               value="{{ $settings['contact_numbers'] ?? '01352 383531, 01352 383532' }}" placeholder="যেমন: 01352 383531, 01352 383532">
+                                    </div>
+                                </div>
+
+                                <!-- Operator / Manager Name -->
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold text-secondary" for="operator_name">
+                                        পরিচালনায় (Operator / Manager)
+                                    </label>
+                                    <input type="text" class="form-control" id="operator_name" name="operator_name" 
+                                           value="{{ $settings['operator_name'] ?? 'মোমিনুর রহমান' }}" placeholder="যেমন: মোমিনুর রহমান">
+                                </div>
+
+                                <!-- Operator Contact -->
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold text-secondary" for="operator_contact">
+                                        পরিচালকের ফোন / হোয়াটসঅ্যাপ
+                                    </label>
+                                    <input type="text" class="form-control" id="operator_contact" name="operator_contact" 
+                                           value="{{ $settings['operator_contact'] ?? '01751-722350 NG/BK' }}" placeholder="যেমন: 01751-722350 NG/BK">
+                                </div>
+
+                                <!-- Nursing Point Address -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-secondary" for="nursing_point_address">
+                                        নার্সিং পয়েন্টের ঠিকানা
+                                    </label>
+                                    <input type="text" class="form-control" id="nursing_point_address" name="nursing_point_address" 
+                                           value="{{ $settings['nursing_point_address'] ?? 'দক্ষিণ পুঁইজালা গেটের ধার, শ্রীউলা, আশাশুনি, সাতক্ষীরা।' }}" 
+                                           placeholder="নার্সিং পয়েন্টের ঠিকানা লিখুন">
+                                </div>
+
+                                <!-- Office Address -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-secondary" for="office_address">
+                                        অফিসের ঠিকানা
+                                    </label>
+                                    <input type="text" class="form-control" id="office_address" name="office_address" 
+                                           value="{{ $settings['office_address'] ?? 'পুঁইজালা বাল্লা বাজার, আশাশুনি, সাতক্ষীরা।' }}" 
+                                           placeholder="অফিসের ঠিকানা লিখুন">
+                                </div>
+
+                                <!-- Memo Slogan -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-secondary" for="memo_slogan">
+                                        মেমোর নিচের স্লোগান (Footer Slogan)
+                                    </label>
+                                    <input type="text" class="form-control" id="memo_slogan" name="memo_slogan" 
+                                           value="{{ $settings['memo_slogan'] ?? 'ধন্যবাদ আবার আসবেন | সততাই ব্যবসার মূল লক্ষ্য' }}" 
+                                           placeholder="যেমন: ধন্যবাদ আবার আসবেন | সততাই ব্যবসার মূল লক্ষ্য">
+                                </div>
+
+                                <!-- Authority Signature Text -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-secondary" for="memo_authority_signature">
+                                        অনুমোদনকারীর স্বাক্ষর টেক্সট
+                                    </label>
+                                    <input type="text" class="form-control" id="memo_authority_signature" name="memo_authority_signature" 
+                                           value="{{ $settings['memo_authority_signature'] ?? 'পক্ষে - মেসার্স সানা ফিস এন্ড নার্সিং পয়েন্ট' }}" 
+                                           placeholder="যেমন: পক্ষে - মেসার্স সানা ফিস এন্ড নার্সিং পয়েন্ট">
                                 </div>
                             </div>
                         </div>

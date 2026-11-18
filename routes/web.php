@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\CustomerDueController;
 use App\Http\Controllers\Admin\DistrictController;
 use App\Http\Controllers\Admin\DivisionController;
 use App\Http\Controllers\Admin\LocationController;
@@ -52,6 +54,12 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
     // Sales (মাছ ও পণ্য বিক্রয় ও চালান)
     Route::post('sales/{sale}/payments', [SalesController::class, 'addPayment'])->name('admin.sales.payment.store');
     Route::resource('sales', SalesController::class)->only(['index', 'create', 'store', 'show', 'destroy'])->names('admin.sales');
+
+    // Customer Due Sheet & Area-wise Collection Report (বকেয়া শিট ও এলাকাভিত্তিক হিসাব)
+    Route::get('reports/customer-due-sheet', [CustomerDueController::class, 'index'])->name('admin.customer-due.index');
+
+    // Customers (কাস্টমার তালিকা ও লেজার হিসাব)
+    Route::resource('customers', CustomerController::class)->only(['index', 'show', 'destroy'])->names('admin.customer');
 
     // Purchases (মাছ ও পণ্য ক্রয় ও বকেয়া হিসাব)
     Route::post('purchases/{purchase}/payments', [PurchaseController::class, 'addPayment'])->name('admin.purchase.payment.store');

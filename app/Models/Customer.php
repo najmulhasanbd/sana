@@ -99,4 +99,28 @@ class Customer extends Model
               });
         });
     }
+
+    public function getTotalSalesAmountAttribute(): float
+    {
+        return (float) ($this->attributes['total_sales'] ?? $this->sales()->sum('total_amount'));
+    }
+
+    public function getTotalPaidAmountAttribute(): float
+    {
+        return (float) ($this->attributes['total_paid'] ?? $this->sales()->sum('paid_amount'));
+    }
+
+    public function getTotalDueAmountAttribute(): float
+    {
+        return (float) ($this->attributes['total_due'] ?? $this->sales()->sum('due_amount'));
+    }
+
+    public function getLocationTextAttribute(): string
+    {
+        return collect([
+            $this->zone?->name,
+            $this->district?->name,
+            $this->division?->name,
+        ])->filter()->implode(', ') ?: ($this->address ?? 'ঠিকানা উল্লেখ নেই');
+    }
 }

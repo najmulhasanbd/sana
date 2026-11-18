@@ -79,6 +79,14 @@ class Sales extends Model
     }
 
     /**
+     * Alias accessor for invoice_number -> invoice_no
+     */
+    public function getInvoiceNumberAttribute(): ?string
+    {
+        return $this->invoice_no;
+    }
+
+    /**
      * Recalculate paid amount, due amount and update payment status.
      */
     public function recalculatePayments(): void

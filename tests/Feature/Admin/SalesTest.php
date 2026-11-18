@@ -176,6 +176,28 @@ class SalesTest extends TestCase
         $response->assertStatus(200);
         $response->assertViewIs('admin.pages.sales.show');
         $response->assertSee('SALE-00002');
+        // If there is no due, পাওনা: and পূর্ব জের: must NOT appear
+        $response->assertDontSee('পাওনা:');
+        $response->assertDontSee('পূর্ব জের:');
+    }
+
+    public function test_memo_displays_due_amount_when_due_exists(): void
+    {
+        $sale = Sales::create([
+            'invoice_no' => 'SALE-DUE-09',
+            'customer_id' => $this->customer->id,
+            'sale_date' => now()->toDateString(),
+            'total_amount' => 5000,
+            'paid_amount' => 2000,
+            'due_amount' => 3000,
+            'payment_status' => 'partial',
+        ]);
+
+        $response = $this->actingAs($this->user)->get(route('admin.sales.show', $sale));
+
+        $response->assertStatus(200);
+        $response->assertSee('পাওনা:');
+        $response->assertSee('3,000.00');
     }
 
     public function test_can_add_due_payment_and_recalculate_due(): void

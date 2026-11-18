@@ -1,15 +1,15 @@
 @extends('admin.layouts.master')
 
-@section('title', 'বিক্রয় চালান - ' . $sale->invoice_no)
+@section('title', 'বিক্রয় মেমো / চালান - ' . $sale->invoice_no)
 
 @section('content')
 <div class="w-100 pb-4">
-    <!-- Top Action Bar (screen only) -->
+    <!-- Top Action Bar (Screen Only) -->
     <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4 d-print-none">
         <div>
             <h4 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
                 <i class="fa-solid fa-receipt text-primary"></i>
-                <span>বিক্রয় চালান বিবরণী</span>
+                <span>বিক্রয় মেমো / চালান</span>
             </h4>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0" style="font-size: 0.8rem;">
@@ -19,10 +19,14 @@
                 </ol>
             </nav>
         </div>
-        <div class="d-flex gap-2">
+        <div class="d-flex flex-wrap gap-2">
             <a href="{{ route('admin.sales.index') }}" class="btn btn-outline-secondary rounded-pill px-3 py-2 fw-semibold shadow-sm d-flex align-items-center gap-2" style="font-size: 0.85rem;">
                 <i class="fa-solid fa-arrow-left"></i>
                 <span>তালিকায় ফিরুন</span>
+            </a>
+            <a href="{{ route('admin.sales.create') }}" class="btn btn-outline-primary rounded-pill px-3 py-2 fw-semibold shadow-sm d-flex align-items-center gap-2" style="font-size: 0.85rem;">
+                <i class="fa-solid fa-plus"></i>
+                <span>নতুন বিক্রয়</span>
             </a>
             @if($sale->due_amount > 0)
                 <button type="button" 
@@ -31,344 +35,395 @@
                         data-bs-target="#addPaymentModal"
                         style="font-size: 0.85rem;">
                     <i class="fa-solid fa-hand-holding-dollar"></i>
-                    <span>বকেয়া আদায় / পরিশোধ</span>
+                    <span>বকেয়া আদায় / জমা</span>
                 </button>
             @endif
-            <button type="button" onclick="window.print()" class="btn btn-primary rounded-pill px-3 py-2 fw-semibold shadow-sm d-flex align-items-center gap-2" style="font-size: 0.85rem;">
+            <button type="button" onclick="window.print()" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold shadow-sm d-flex align-items-center gap-2" style="font-size: 0.85rem;">
                 <i class="fa-solid fa-print"></i>
-                <span>প্রিন্ট চালান</span>
+                <span>প্রিন্ট মেমো (A4)</span>
             </button>
         </div>
     </div>
 
-    {{-- ===== SCREEN VIEW (non-print) ===== --}}
-    <div class="d-print-none">
-        <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden p-4 p-md-5 mb-4">
-            {{-- Invoice Header --}}
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-4 pb-4 border-bottom">
-                <div>
-                    <div class="d-flex align-items-center gap-2 mb-2">
-                        <div class="rounded-3 d-flex align-items-center justify-content-center text-white" 
-                             style="width: 42px; height: 42px; background: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);">
-                            <i class="fa-solid fa-fish fs-5"></i>
-                        </div>
-                        <div>
-                            <h4 class="fw-bold text-dark mb-0">{{ config('app.name', 'সানা ফিশারিজ') }}</h4>
-                            <small class="text-muted" style="font-size: 0.78rem;">মাছের ছানা ও আধুনিক পোনা বাজার</small>
-                        </div>
-                    </div>
-                    <p class="text-muted small mb-0"><i class="fa-solid fa-location-dot me-1 text-danger"></i>ময়মনসিংহ, বাংলাদেশ</p>
-                </div>
-                <div class="text-md-end">
-                    <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-1.5 rounded-pill fw-bold fs-6 mb-2 d-block">
-                        চালান নং: {{ $sale->invoice_no }}
-                    </span>
-                    <div class="text-muted small"><strong>তারিখ:</strong> {{ $sale->sale_date ? $sale->sale_date->format('d M, Y') : '—' }}</div>
-                    <div class="text-muted small"><strong>তৈরির সময়:</strong> {{ $sale->created_at ? $sale->created_at->format('h:i A') : '—' }}</div>
-                </div>
+    <!-- Payment History Strip (Screen Only) -->
+    @if($sale->payments->isNotEmpty())
+        <div class="card border-0 shadow-sm rounded-4 bg-white p-3 mb-4 d-print-none">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                <span class="fw-bold text-dark small d-flex align-items-center gap-1.5">
+                    <i class="fa-solid fa-clock-rotate-left text-primary"></i>পরিশোধ ও জমার ইতিহাস ({{ $sale->payments->count() }}টি)
+                </span>
+                <span class="badge {{ $sale->due_amount > 0 ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success' }} rounded-pill px-3 py-1 fw-bold" style="font-size: 0.78rem;">
+                    {{ $sale->due_amount > 0 ? 'বকেয়া: ৳' . number_format($sale->due_amount, 2) : 'সম্পূর্ণ পরিশোধিত' }}
+                </span>
             </div>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0" style="font-size: 0.82rem;">
+                    <thead class="bg-light text-muted">
+                        <tr>
+                            <th class="ps-2">তারিখ</th>
+                            <th>মাধ্যম</th>
+                            <th>ট্রানজেকশন আইডি</th>
+                            <th>নোট</th>
+                            <th class="text-end pe-2">জমার পরিমাণ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($sale->payments as $payment)
+                            <tr>
+                                <td class="ps-2">{{ $payment->payment_date ? $payment->payment_date->format('d M, Y') : '—' }}</td>
+                                <td><span class="badge bg-light text-dark border">{{ $payment->payment_method }}</span></td>
+                                <td class="text-muted">{{ $payment->transaction_id ?? '—' }}</td>
+                                <td class="text-muted">{{ $payment->note ?? '—' }}</td>
+                                <td class="text-end pe-2 fw-bold text-success">৳{{ number_format($payment->amount, 2) }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    @endif
 
-            {{-- Customer & Status --}}
-            <div class="row g-4 py-4 border-bottom">
-                <div class="col-12 col-md-6">
-                    <small class="text-muted text-uppercase fw-bold d-block mb-2" style="font-size: 0.72rem; letter-spacing: 0.5px;">ক্রেতা / কাস্টমার তথ্য</small>
-                    <h5 class="fw-bold text-dark mb-1">{{ $sale->customer?->name ?? '—' }}</h5>
-                    <p class="text-secondary small mb-1"><i class="fa-solid fa-phone text-muted me-1.5"></i>{{ $sale->customer?->mobile ?? '—' }}</p>
-                    @if($sale->customer?->email)
-                        <p class="text-secondary small mb-1"><i class="fa-solid fa-envelope text-muted me-1.5"></i>{{ $sale->customer->email }}</p>
-                    @endif
-                    <p class="text-muted small mb-0">
-                        <i class="fa-solid fa-location-dot text-muted me-1.5"></i>
-                        {{ collect([$sale->customer?->zone?->name, $sale->customer?->district?->name, $sale->customer?->division?->name])->filter()->implode(', ') ?: ($sale->customer?->address ?? 'ঠিকানা উল্লেখ নেই') }}
-                    </p>
-                </div>
-                <div class="col-12 col-md-6 text-md-end">
-                    <small class="text-muted text-uppercase fw-bold d-block mb-2" style="font-size: 0.72rem; letter-spacing: 0.5px;">পরিশোধ অবস্থা</small>
-                    <div class="mb-2">
-                        @if($sale->payment_status === 'paid')
-                            <span class="badge rounded-pill bg-success-subtle text-success px-3 py-1.5 fw-bold fs-6">
-                                <i class="fa-solid fa-circle-check me-1"></i>সম্পূর্ণ পরিশোধিত (Paid)
-                            </span>
-                        @elseif($sale->payment_status === 'partial')
-                            <span class="badge rounded-pill bg-warning-subtle text-warning px-3 py-1.5 fw-bold fs-6">
-                                <i class="fa-solid fa-clock-rotate-left me-1"></i>আংশিক বকেয়া (Partial)
-                            </span>
-                        @else
-                            <span class="badge rounded-pill bg-danger-subtle text-danger px-3 py-1.5 fw-bold fs-6">
-                                <i class="fa-solid fa-circle-exclamation me-1"></i>সম্পূর্ণ বকেয়া (Due)
-                            </span>
+    <!-- ========================================================================= -->
+    <!-- OFFICIAL FULL A4 MEMO (Screen & Print Perfect)                             -->
+    <!-- ========================================================================= -->
+    @php
+        $memoBusinessName = \App\Models\Setting::get('memo_business_name', \App\Models\Setting::get('business_name', 'মেসার্স সানা ফিস এন্ড নার্সিং পয়েন্ট'));
+        $memoSubtitle = \App\Models\Setting::get('memo_subtitle', 'এখানে সকল প্রকার বাগদার পোনা নার্সিং করা হয় ও বিক্রয়ের নির্ভরযোগ্য প্রতিষ্ঠান।');
+        $proprietorName = \App\Models\Setting::get('proprietor_name', 'আলহাজ্ব নজরুল ইসলাম সানা');
+        $proprietorMobile = \App\Models\Setting::get('proprietor_mobile', '01737 908309');
+        $contactNumbers = \App\Models\Setting::get('contact_numbers', '01352 383531, 01352 383532');
+        $operatorName = \App\Models\Setting::get('operator_name', 'মোমিনুর রহমান');
+        $operatorContact = \App\Models\Setting::get('operator_contact', '01751-722350 NG/BK');
+        $nursingPointAddress = \App\Models\Setting::get('nursing_point_address', 'দক্ষিণ পুঁইজালা গেটের ধার, শ্রীউলা, আশাশুনি, সাতক্ষীরা।');
+        $officeAddress = \App\Models\Setting::get('office_address', 'পুঁইজালা বাল্লা বাজার, আশাশুনি, সাতক্ষীরা।');
+        $memoSlogan = \App\Models\Setting::get('memo_slogan', 'ধন্যবাদ আবার আসবেন | সততাই ব্যবসার মূল লক্ষ্য');
+        $memoAuthoritySignature = \App\Models\Setting::get('memo_authority_signature', 'পক্ষে - মেসার্স সানা ফিস এন্ড নার্সিং পয়েন্ট');
+        $siteLogo = \App\Models\Setting::get('site_logo');
+    @endphp
+    <div class="d-flex justify-content-center">
+        <div class="official-memo-wrapper bg-white shadow-sm">
+            <div class="official-memo-border d-flex flex-column justify-content-between">
+                
+                <!-- UPPER SECTION: HEADER, CUSTOMER & ITEMS -->
+                <div>
+                    <!-- TOP HEADER -->
+                    <div class="memo-header text-center position-relative">
+                        <!-- Bismillah -->
+                        <div class="bismillah text-dark fw-bold mb-1" style="font-size: 11pt; letter-spacing: 0.5px;">
+                            বিসমিল্লাহির রাহমানির রাহিম
+                        </div>
+
+                        <!-- Challan Badge -->
+                        <div class="d-inline-block challan-badge mb-2">
+                            চা &nbsp;|&nbsp; লা &nbsp;|&nbsp; ন
+                        </div>
+
+                        <!-- Header Content with Logo -->
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <!-- Left Circular Logo -->
+                            <div class="memo-logo flex-shrink-0">
+                                @if(!empty($siteLogo) && file_exists(public_path($siteLogo)))
+                                    <img src="{{ asset($siteLogo) }}" alt="{{ $memoBusinessName }}" style="max-width: 86px; max-height: 86px; object-fit: contain;">
+                                @else
+                                    <div class="logo-circle">
+                                        <svg viewBox="0 0 100 100" class="logo-svg">
+                                            <circle cx="50" cy="50" r="46" fill="#f0fdf4" stroke="#0284c7" stroke-width="2.5" />
+                                            <circle cx="50" cy="50" r="42" fill="none" stroke="#0ea5e9" stroke-width="1" stroke-dasharray="2,2" />
+                                            <g fill="#0284c7">
+                                                <path d="M30 42 C 35 32, 55 30, 68 36 C 72 38, 76 43, 70 45 C 64 47, 52 44, 42 46 C 36 47, 32 45, 30 42 Z" />
+                                                <circle cx="72" cy="40" r="2" fill="#0f172a" />
+                                                <path d="M72 39 Q 82 34 88 30" stroke="#0284c7" stroke-width="1.2" fill="none" />
+                                                <path d="M72 41 Q 84 38 90 38" stroke="#0284c7" stroke-width="1.2" fill="none" />
+                                                <path d="M32 43 Q 22 46 18 52" stroke="#0284c7" stroke-width="1.5" fill="none" />
+                                                
+                                                <path d="M70 58 C 65 68, 45 70, 32 64 C 28 62, 24 57, 30 55 C 36 53, 48 56, 58 54 C 64 53, 68 55, 70 58 Z" fill="#0d9488" />
+                                                <circle cx="28" cy="60" r="2" fill="#0f172a" />
+                                                <path d="M28 61 Q 18 66 12 70" stroke="#0d9488" stroke-width="1.2" fill="none" />
+                                                <path d="M28 59 Q 16 62 10 62" stroke="#0d9488" stroke-width="1.2" fill="none" />
+                                                <path d="M68 57 Q 78 54 82 48" stroke="#0d9488" stroke-width="1.5" fill="none" />
+                                            </g>
+                                        </svg>
+                                        <div class="logo-inner-text">
+                                            <span>মেসার্স</span><br>
+                                            <strong>সানা ফিস</strong>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <!-- Center Title & Tagline -->
+                            <div class="memo-title-block flex-grow-1 px-2">
+                                <h1 class="memo-company-title mb-0">{{ $memoBusinessName }}</h1>
+                                @if(!empty($memoSubtitle))
+                                    <div class="memo-subtitle fw-bold text-dark mt-1">
+                                        {{ $memoSubtitle }}
+                                    </div>
+                                @endif
+                                @if(!empty($proprietorName) || !empty($proprietorMobile) || !empty($contactNumbers))
+                                    <div class="memo-proprietor mt-1">
+                                        (
+                                        @if(!empty($proprietorName))
+                                            প্রোপাইটার: {{ $proprietorName }}
+                                        @endif
+                                        @if(!empty($proprietorMobile))
+                                            ({{ $proprietorMobile }})
+                                        @endif
+                                        @if(!empty($contactNumbers))
+                                            &nbsp;&nbsp;(যোগাযোগ: {{ $contactNumbers }})
+                                        @endif
+                                        )
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <!-- Invoice No & Operator Row -->
+                        <div class="d-flex justify-content-between align-items-center px-1 mb-2">
+                            <div class="memo-invoice-number fw-bold text-dark" style="font-size: 11pt;">
+                                চালান নং - <span class="text-primary fw-bolder">{{ $sale->invoice_no }}</span>
+                            </div>
+                            @if(!empty($operatorName) || !empty($operatorContact))
+                                <div class="d-flex align-items-center gap-2">
+                                    @if(!empty($operatorName))
+                                        <span class="operator-badge">পরিচালনায়: {{ $operatorName }}</span>
+                                    @endif
+                                    @if(!empty($operatorContact))
+                                        <span class="contact-pill">
+                                            <i class="fa-brands fa-whatsapp text-success me-1"></i>
+                                            <i class="fa-solid fa-phone text-primary me-1"></i>
+                                            <strong>{{ $operatorContact }}</strong>
+                                        </span>
+                                    @endif
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- Purple Address Banner Box (Shows only if at least one address is set) -->
+                        @if(!empty($nursingPointAddress) || !empty($officeAddress))
+                            <div class="purple-address-banner mb-3">
+                                @if(!empty($nursingPointAddress))
+                                    <div>নার্সিং পয়েন্ট: {{ $nursingPointAddress }}</div>
+                                @endif
+                                @if(!empty($officeAddress))
+                                    <div>অফিস: {{ $officeAddress }}</div>
+                                @endif
+                            </div>
                         @endif
                     </div>
-                    @if($sale->due_amount > 0)
-                        <p class="text-danger fw-bold mb-0">অবশিষ্ট বকেয়া: ৳{{ number_format($sale->due_amount, 2) }}</p>
-                    @endif
-                </div>
-            </div>
 
-            {{-- Items Table --}}
-            <div class="py-4 border-bottom">
-                <h6 class="fw-bold text-dark mb-3">বিক্রয়কৃত মাছ ও পণ্যের বিবরণ</h6>
-                <div class="table-responsive">
-                    <table class="table align-middle mb-0">
-                        <thead class="bg-light table-light">
+                    <!-- CUSTOMER INFO GRID BOX -->
+                    <div class="customer-info-grid mb-3">
+                        <table class="w-100 customer-table">
                             <tr>
-                                <th class="py-2.5 ps-3 text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem; width: 60px;">#</th>
-                                <th class="py-2.5 text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem;">পণ্যের নাম</th>
-                                <th class="py-2.5 text-secondary text-uppercase fw-semibold text-center" style="font-size: 0.75rem;">পরিমাণ</th>
-                                <th class="py-2.5 text-secondary text-uppercase fw-semibold text-center" style="font-size: 0.75rem;">একক</th>
-                                <th class="py-2.5 text-secondary text-uppercase fw-semibold text-end" style="font-size: 0.75rem;">একক দর (৳)</th>
-                                <th class="py-2.5 pe-3 text-secondary text-uppercase fw-semibold text-end" style="font-size: 0.75rem;">মোট মূল্য (৳)</th>
+                                <td class="customer-label" style="width: 85px;">নাম:</td>
+                                <td class="customer-value" colspan="3">
+                                    <span class="fw-bold text-dark" style="font-size: 11pt;">{{ $sale->customer?->name ?? '—' }}</span>
+                                    @if(!empty($sale->customer?->mobile))
+                                        <span class="text-muted ms-2 fw-normal">({{ $sale->customer->mobile }})</span>
+                                    @endif
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($sale->items as $index => $item)
-                                <tr>
-                                    <td class="ps-3 text-muted fw-medium">{{ $index + 1 }}</td>
-                                    <td><span class="fw-bold text-dark">{{ $item->product?->name ?? '—' }}</span></td>
-                                    <td class="text-center fw-semibold text-secondary">{{ number_format($item->quantity, 2) }}</td>
-                                    <td class="text-center"><span class="badge bg-light text-dark border">{{ $item->unit }}</span></td>
-                                    <td class="text-end fw-semibold text-secondary">৳{{ number_format($item->unit_price, 2) }}</td>
-                                    <td class="pe-3 text-end fw-bold text-dark">৳{{ number_format($item->total_price, 2) }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                            <tr>
+                                <td class="customer-label" style="width: 85px;">ঠিকানা:</td>
+                                <td class="customer-value">
+                                    {{ $sale->customer?->location_text ?: ($sale->customer?->address ?? '—') }}
+                                </td>
+                                <td class="customer-label" style="width: 80px; text-align: center;">তারিখ:</td>
+                                <td class="customer-value" style="width: 140px; text-align: center; font-weight: bold;">
+                                    {{ $sale->sale_date ? $sale->sale_date->format('d/m/Y') : date('d/m/Y') }}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
 
-            {{-- Financial Summary --}}
-            <div class="row g-4 py-4 border-bottom">
-                <div class="col-12 col-md-6">
-                    @if($sale->note)
-                        <div class="p-3 rounded-3 bg-light border">
-                            <small class="text-muted fw-bold d-block mb-1">মন্তব্য:</small>
-                            <p class="text-secondary small mb-0">{{ $sale->note }}</p>
+                    <!-- DYNAMIC ITEMS TABLE (Columns based on item data, rows exactly match item count) -->
+                    @php
+                        $hasBox = $sale->items->contains(fn($it) => !empty($it->box) && $it->box != '0' && $it->box !== '—');
+                        $hasPoly = $sale->items->contains(fn($it) => !empty($it->poly) && $it->poly != '0' && $it->poly !== '—');
+                        $hasMeer = $sale->items->contains(fn($it) => !empty($it->meer) && $it->meer != '0' && $it->meer !== '—');
+                        $hasCustomUnit = $sale->items->contains(fn($it) => !empty($it->unit) && !in_array(trim($it->unit), ['পিস', 'piece', 'pcs', 'টি', '']));
+                        $colCount = 3 + ($hasBox ? 1 : 0) + ($hasPoly ? 1 : 0) + ($hasMeer ? 1 : 0) + ($hasCustomUnit ? 1 : 0);
+                    @endphp
+                    <div class="items-table-container position-relative mb-3">
+                        <!-- Faint Center Watermark -->
+                        <div class="watermark-overlay" aria-hidden="true">
+                            @if(!empty($siteLogo) && file_exists(public_path($siteLogo)))
+                                <img src="{{ asset($siteLogo) }}" alt="" style="max-width: 220px; max-height: 220px; object-fit: contain; opacity: 0.10;">
+                            @else
+                                <svg viewBox="0 0 200 200" width="240" height="240" class="watermark-svg">
+                                    <circle cx="100" cy="100" r="92" fill="none" stroke="#0284c7" stroke-width="4" stroke-opacity="0.12" />
+                                    <circle cx="100" cy="100" r="84" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-opacity="0.1" stroke-dasharray="4,4" />
+                                    <g fill="#0284c7" fill-opacity="0.12">
+                                        <path d="M60 84 C 70 64, 110 60, 136 72 C 144 76, 152 86, 140 90 C 128 94, 104 88, 84 92 C 72 94, 64 90, 60 84 Z" />
+                                        <circle cx="144" cy="80" r="4" />
+                                        <path d="M140 116 C 130 136, 90 140, 64 128 C 56 124, 48 114, 60 110 C 72 106, 96 112, 116 108 C 128 106, 136 110, 140 116 Z" />
+                                        <circle cx="56" cy="120" r="4" />
+                                    </g>
+                                </svg>
+                            @endif
+                            <div class="watermark-text">{{ $memoBusinessName }}</div>
+                        </div>
+
+                        <!-- Items Table -->
+                        <table class="memo-items-table w-100">
+                            <thead>
+                                <tr>
+                                    <th>ব্র্যান্ড / পোনার নাম</th>
+                                    @if($hasBox)
+                                        <th style="width: 80px; text-align: center;">বক্স</th>
+                                    @endif
+                                    @if($hasPoly)
+                                        <th style="width: 80px; text-align: center;">পলি</th>
+                                    @endif
+                                    @if($hasMeer)
+                                        <th style="width: 85px; text-align: center;">মীর</th>
+                                    @endif
+                                    <th style="width: 110px; text-align: center;">মোট পোনা</th>
+                                    @if($hasCustomUnit)
+                                        <th style="width: 80px; text-align: center;">একক</th>
+                                    @endif
+                                    <th style="width: 105px; text-align: right;">দর (৳)</th>
+                                    <th style="width: 125px; text-align: right;">মোট দাম (৳)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($sale->items as $item)
+                                    <tr class="item-row">
+                                        <td class="text-start ps-3 fw-bold text-dark">
+                                            {{ $item->product?->name ?? $item->product_name }}
+                                        </td>
+                                        @if($hasBox)
+                                            <td class="text-center">{{ $item->box ?: '—' }}</td>
+                                        @endif
+                                        @if($hasPoly)
+                                            <td class="text-center">{{ $item->poly ?: '—' }}</td>
+                                        @endif
+                                        @if($hasMeer)
+                                            <td class="text-center">{{ $item->meer ?: '—' }}</td>
+                                        @endif
+                                        <td class="text-center fw-bold text-dark">
+                                            {{ number_format($item->quantity) }}
+                                        </td>
+                                        @if($hasCustomUnit)
+                                            <td class="text-center text-muted">
+                                                {{ $item->unit ?: 'পিস' }}
+                                            </td>
+                                        @endif
+                                        <td class="text-end pe-2">
+                                            {{ number_format($item->unit_price, 2) }}
+                                        </td>
+                                        <td class="text-end pe-2 fw-bold text-dark">
+                                            {{ number_format($item->total_price, 2) }}
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="{{ $colCount }}" class="text-center py-3 text-muted">
+                                            কোনো পণ্য আইটেম পাওয়া যায়নি।
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- LOWER SECTION: TOTALS, IN WORDS, SLOGAN & SIGNATURES -->
+                <div class="memo-bottom-block">
+                    <!-- TOTALS & PREVIOUS DUE CALCULATION SECTION -->
+                    <div class="memo-bottom-section d-flex justify-content-between align-items-start gap-3 mb-3">
+                        <!-- Left: In Words (টাকা কথায়) & Note -->
+                        <div class="in-words-container flex-grow-1">
+                            <div class="in-words-box d-flex align-items-center mb-2">
+                                <div class="in-words-label">টাকা (কথায়):</div>
+                                <div class="in-words-value flex-grow-1 ps-2 fw-bold text-dark">
+                                    {{ \App\Helpers\BanglaNumberHelper::bnWords(($previousDue ?? 0) > 0 ? ($grandTotal ?? $sale->total_amount) : $sale->total_amount) }}
+                                </div>
+                            </div>
+
+                            @if(!empty($sale->note))
+                                <div class="memo-note-box p-2 border rounded-2 bg-light">
+                                    <small class="fw-bold text-muted d-block">মন্তব্য / নোট:</small>
+                                    <span class="text-dark small">{{ $sale->note }}</span>
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- Right: Summary Table (মোট, পূর্ব জের, সর্বমোট, জমা, পাওনা - শর্তসাপেক্ষ ডায়নামিক) -->
+                        <div class="summary-table-container" style="width: 250px;">
+                            <table class="w-100 summary-table">
+                                <tr>
+                                    <td class="summary-label">মোট:</td>
+                                    <td class="summary-val text-end pe-2 fw-bold">
+                                        {{ number_format($sale->total_amount, 2) }}
+                                    </td>
+                                </tr>
+                                @if(($previousDue ?? 0) > 0)
+                                    <tr>
+                                        <td class="summary-label">পূর্ব জের:</td>
+                                        <td class="summary-val text-end pe-2 fw-bold text-secondary">
+                                            {{ number_format($previousDue, 2) }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="summary-label">সর্বমোট:</td>
+                                        <td class="summary-val text-end pe-2 fw-bold text-dark" style="background:#f8fafc;">
+                                            {{ number_format($grandTotal ?? $sale->total_amount, 2) }}
+                                        </td>
+                                    </tr>
+                                @endif
+                                @if($sale->paid_amount > 0)
+                                    <tr>
+                                        <td class="summary-label">জমা:</td>
+                                        <td class="summary-val text-end pe-2 fw-bold text-success">
+                                            {{ number_format($sale->paid_amount, 2) }}
+                                        </td>
+                                    </tr>
+                                @endif
+                                @php
+                                    $dueBalance = (float)($totalOutstanding ?? $sale->due_amount);
+                                @endphp
+                                @if($dueBalance > 0)
+                                    <tr>
+                                        <td class="summary-label bg-danger-cell">পাওনা:</td>
+                                        <td class="summary-val text-end pe-2 fw-bolder text-danger" style="background:#fef2f2;">
+                                            {{ number_format($dueBalance, 2) }}
+                                        </td>
+                                    </tr>
+                                @elseif($sale->paid_amount > 0 && $dueBalance <= 0)
+                                    <tr>
+                                        <td class="summary-label bg-success text-white">অবস্থা:</td>
+                                        <td class="summary-val text-end pe-2 fw-bold text-success" style="background:#f0fdf4;">
+                                            <i class="fa-solid fa-circle-check me-1"></i>পরিশোধিত
+                                        </td>
+                                    </tr>
+                                @endif
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- FOOTER SLOGAN BANNER (DYNAMIC FROM SETTINGS) -->
+                    @if($memoSlogan)
+                        <div class="text-center mb-4">
+                            <div class="slogan-pill-banner d-inline-block">
+                                {{ $memoSlogan }}
+                            </div>
                         </div>
                     @endif
-                </div>
-                <div class="col-12 col-md-6">
-                    <div class="p-3 rounded-3 bg-light border">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted fw-semibold">সর্বমোট মূল্য:</span>
-                            <span class="fw-bold text-dark fs-6">৳{{ number_format($sale->total_amount, 2) }}</span>
+
+                    <!-- SIGNATURE BLOCK (DYNAMIC FROM SETTINGS) -->
+                    <div class="signature-row d-flex justify-content-between align-items-end pt-4 pb-2">
+                        <div class="text-center" style="width: 200px;">
+                            <div class="sig-line">................................................</div>
+                            <div class="fw-bold text-dark small mt-1">ক্রেতার স্বাক্ষর</div>
                         </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted fw-semibold">মোট আদায় / পরিশোধ:</span>
-                            <span class="fw-bold text-success fs-6">৳{{ number_format($sale->paid_amount, 2) }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between pt-2 border-top">
-                            <span class="fw-bold text-dark">অবশিষ্ট বকেয়া:</span>
-                            <span class="fw-bold {{ $sale->due_amount > 0 ? 'text-danger' : 'text-success' }} fs-5">
-                                ৳{{ number_format($sale->due_amount, 2) }}
-                            </span>
+                        <div class="text-center" style="width: 260px;">
+                            <div class="sig-line">................................................</div>
+                            <div class="fw-bold text-dark small mt-1">{{ $memoAuthoritySignature }}</div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {{-- Payment History --}}
-            <div class="pt-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
-                        <i class="fa-solid fa-clock-rotate-left text-primary"></i>
-                        <span>পরিশোধের ইতিহাস (Payment History)</span>
-                    </h6>
-                    @if($sale->due_amount > 0)
-                        <button type="button" 
-                                class="btn btn-sm btn-outline-success rounded-pill px-3 py-1 fw-semibold" 
-                                data-bs-toggle="modal" 
-                                data-bs-target="#addPaymentModal">
-                            <i class="fa-solid fa-plus me-1"></i>বকেয়া জমা
-                        </button>
-                    @endif
-                </div>
-                <div class="table-responsive">
-                    <table class="table align-middle mb-0 table-sm">
-                        <thead class="bg-light table-light">
-                            <tr>
-                                <th class="ps-3 py-2 text-secondary text-uppercase fw-semibold" style="font-size: 0.72rem; width: 50px;">#</th>
-                                <th class="py-2 text-secondary text-uppercase fw-semibold" style="font-size: 0.72rem;">পরিশোধের তারিখ</th>
-                                <th class="py-2 text-secondary text-uppercase fw-semibold" style="font-size: 0.72rem;">পরিশোধের মাধ্যম</th>
-                                <th class="py-2 text-secondary text-uppercase fw-semibold" style="font-size: 0.72rem;">ট্রানজেকশন আইডি</th>
-                                <th class="py-2 text-secondary text-uppercase fw-semibold text-end" style="font-size: 0.72rem;">জমা টাকা</th>
-                                <th class="pe-3 py-2 text-secondary text-uppercase fw-semibold" style="font-size: 0.72rem;">নোট</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($sale->payments as $pIdx => $payment)
-                                <tr>
-                                    <td class="ps-3 text-muted">{{ $pIdx + 1 }}</td>
-                                    <td class="text-dark fw-medium">{{ $payment->payment_date ? $payment->payment_date->format('d M, Y') : '—' }}</td>
-                                    <td>
-                                        <span class="badge rounded-pill bg-light border text-dark px-2.5 py-1">
-                                            <i class="fa-solid fa-credit-card me-1 text-primary"></i>{{ $payment->payment_method }}
-                                        </span>
-                                    </td>
-                                    <td class="text-muted small">{{ $payment->transaction_id ?? '—' }}</td>
-                                    <td class="text-end fw-bold text-success">৳{{ number_format($payment->amount, 2) }}</td>
-                                    <td class="pe-3 text-muted small">{{ $payment->note ?? '—' }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="text-center py-3 text-muted">এখনও কোনো পরিশোধ রেকর্ড নেই।</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- ===== PRINT-ONLY INVOICE (A4 professional layout) ===== --}}
-    <div id="printableInvoice" style="display: none;">
-        {{-- Company Header --}}
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom: 3px solid #0284c7; padding-bottom: 14px; margin-bottom: 16px;">
-            <div style="display:flex; align-items:flex-start; gap:12px;">
-                <div style="width:52px; height:52px; background:linear-gradient(135deg,#0284c7 0%,#0d9488 100%); border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" fill="white">
-                        <path d="M60 32c-6-8-16-14-28-14C18 18 8 26 4 32c4 6 14 14 28 14 12 0 22-6 28-14zM32 42a10 10 0 1 1 0-20 10 10 0 0 1 0 20z"/>
-                        <circle cx="35" cy="30" r="3" fill="#0d9488"/>
-                        <path d="M4 32 C0 28 0 36 4 32z"/>
-                    </svg>
-                </div>
-                <div>
-                    <div style="font-size:21px; font-weight:800; color:#0284c7; line-height:1.1; letter-spacing:-0.5px;">{{ config('app.name', 'সানা ফিশারিজ') }}</div>
-                    <div style="font-size:11px; color:#0d9488; font-weight:600; margin-top:2px;">🐟 মাছের পোনা ও হ্যাচারি সরবরাহকারী</div>
-                    <div style="font-size:10px; color:#777; margin-top:2px;">📍 ময়মনসিংহ, বাংলাদেশ &nbsp;|&nbsp; 🌐 মৎস্য চাষের বিশ্বস্ত অংশীদার</div>
-                </div>
-            </div>
-            <div style="text-align:right;">
-                <div style="display:inline-block; font-size:12px; font-weight:700; color:#fff; background:linear-gradient(135deg,#0284c7,#0d9488); padding:5px 16px; border-radius:6px; letter-spacing:0.8px;">
-                    🐠 বিক্রয় চালান
-                </div>
-                <div style="font-size:12px; margin-top:7px; color:#111;"><strong>চালান নং:</strong> <span style="color:#0284c7; font-weight:700;">{{ $sale->invoice_no }}</span></div>
-                <div style="font-size:10.5px; color:#555;"><strong>তারিখ:</strong> {{ $sale->sale_date ? $sale->sale_date->format('d M, Y') : '—' }}</div>
-                <div style="font-size:10.5px; color:#555;"><strong>মুদ্রণ সময়:</strong> {{ $sale->created_at ? $sale->created_at->format('h:i A') : '—' }}</div>
-            </div>
-        </div>
-
-        {{-- Customer & Status --}}
-        <div style="display:flex; justify-content:space-between; gap:20px; margin-bottom:16px;">
-            <div style="flex:1; background:#f0f9ff; border:1px solid #bae6fd; border-radius:7px; padding:10px 14px;">
-                <div style="font-size:9.5px; text-transform:uppercase; font-weight:700; color:#666; letter-spacing:0.8px; margin-bottom:5px;">ক্রেতা / কাস্টমার তথ্য</div>
-                <div style="font-size:14px; font-weight:700; color:#111; margin-bottom:3px;">{{ $sale->customer?->name ?? '—' }}</div>
-                <div style="font-size:11px; color:#444;">📞 {{ $sale->customer?->mobile ?? '—' }}</div>
-                @if($sale->customer?->email)
-                    <div style="font-size:11px; color:#444;">✉ {{ $sale->customer->email }}</div>
-                @endif
-                @php
-                    $sLoc = collect([$sale->customer?->zone?->name, $sale->customer?->district?->name, $sale->customer?->division?->name])->filter()->implode(', ') ?: ($sale->customer?->address ?? '');
-                @endphp
-                @if($sLoc)
-                    <div style="font-size:11px; color:#555; margin-top:1px;">📍 {{ $sLoc }}</div>
-                @endif
-            </div>
-            <div style="text-align:right; min-width:190px;">
-                <div style="font-size:9.5px; text-transform:uppercase; font-weight:700; color:#666; letter-spacing:0.8px; margin-bottom:7px;">পরিশোধ অবস্থা</div>
-                @if($sale->payment_status === 'paid')
-                    <div style="display:inline-block; background:#dcfce7; color:#16a34a; border:1.5px solid #86efac; border-radius:20px; padding:4px 12px; font-size:11px; font-weight:700;">✓ সম্পূর্ণ পরিশোধিত</div>
-                @elseif($sale->payment_status === 'partial')
-                    <div style="display:inline-block; background:#fef9c3; color:#ca8a04; border:1.5px solid #fde047; border-radius:20px; padding:4px 12px; font-size:11px; font-weight:700;">⚡ আংশিক বকেয়া</div>
-                @else
-                    <div style="display:inline-block; background:#fee2e2; color:#dc2626; border:1.5px solid #fca5a5; border-radius:20px; padding:4px 12px; font-size:11px; font-weight:700;">✕ সম্পূর্ণ বকেয়া</div>
-                @endif
-            </div>
-        </div>
-
-        {{-- Items Table --}}
-        <div style="margin-bottom:16px;">
-            <div style="font-size:10px; font-weight:700; text-transform:uppercase; color:#0284c7; letter-spacing:0.5px; margin-bottom:7px; border-left:3.5px solid #0284c7; padding-left:8px;">বিক্রয়কৃত মাছ ও পণ্যের বিবরণ</div>
-            <table style="width:100%; border-collapse:collapse; font-size:11.5px;">
-                <thead>
-                    <tr style="background:#0284c7; color:#fff;">
-                        <th style="padding:7px 8px; text-align:left; width:35px;">#</th>
-                        <th style="padding:7px 8px; text-align:left;">পণ্যের নাম</th>
-                        <th style="padding:7px 8px; text-align:center; width:95px;">পরিমাণ</th>
-                        <th style="padding:7px 8px; text-align:center; width:65px;">একক</th>
-                        <th style="padding:7px 8px; text-align:right; width:100px;">একক দর (৳)</th>
-                        <th style="padding:7px 12px 7px 8px; text-align:right; width:110px;">মোট মূল্য (৳)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($sale->items as $i => $item)
-                        <tr style="background:{{ $i % 2 === 0 ? '#f8fafc' : '#fff' }}; border-bottom:1px solid #e2e8f0;">
-                            <td style="padding:6px 8px; color:#666;">{{ $i + 1 }}</td>
-                            <td style="padding:6px 8px; font-weight:600; color:#111;">{{ $item->product?->name ?? '—' }}</td>
-                            <td style="padding:6px 8px; text-align:center; color:#444;">{{ number_format($item->quantity, 2) }}</td>
-                            <td style="padding:6px 8px; text-align:center; color:#555;">{{ $item->unit }}</td>
-                            <td style="padding:6px 8px; text-align:right; color:#444;">{{ number_format($item->unit_price, 2) }}</td>
-                            <td style="padding:6px 12px 6px 8px; text-align:right; font-weight:700; color:#111;">{{ number_format($item->total_price, 2) }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-
-        {{-- Financial Summary (right aligned) --}}
-        <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
-            <table style="min-width:250px; border-collapse:collapse; font-size:11.5px; border:1.5px solid #e2e8f0; border-radius:7px; overflow:hidden;">
-                <tr style="background:#f8fafc; border-bottom:1px solid #e2e8f0;">
-                    <td style="padding:7px 14px; color:#555; font-weight:600;">সর্বমোট মূল্য:</td>
-                    <td style="padding:7px 14px; text-align:right; font-weight:700; color:#111;">৳{{ number_format($sale->total_amount, 2) }}</td>
-                </tr>
-                <tr style="background:#f8fafc; border-bottom:1px solid #e2e8f0;">
-                    <td style="padding:7px 14px; color:#555; font-weight:600;">মোট আদায়:</td>
-                    <td style="padding:7px 14px; text-align:right; font-weight:700; color:#16a34a;">৳{{ number_format($sale->paid_amount, 2) }}</td>
-                </tr>
-                <tr style="background:{{ $sale->due_amount > 0 ? '#fee2e2' : '#dcfce7' }};">
-                    <td style="padding:9px 14px; font-weight:700; color:#111;">অবশিষ্ট বকেয়া:</td>
-                    <td style="padding:9px 14px; text-align:right; font-size:14px; font-weight:800; color:{{ $sale->due_amount > 0 ? '#dc2626' : '#16a34a' }};">৳{{ number_format($sale->due_amount, 2) }}</td>
-                </tr>
-            </table>
-        </div>
-
-        @if($sale->note)
-        <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:6px; padding:8px 12px; margin-bottom:16px; font-size:10.5px; color:#555;">
-            <strong style="color:#92400e;">মন্তব্য:</strong> {{ $sale->note }}
-        </div>
-        @endif
-
-        {{-- Payment History --}}
-        @if($sale->payments->isNotEmpty())
-        <div style="margin-bottom:16px;">
-            <div style="font-size:10px; font-weight:700; text-transform:uppercase; color:#334155; letter-spacing:0.5px; margin-bottom:7px; border-left:3.5px solid #334155; padding-left:8px;">আদায় ও পরিশোধের ইতিহাস</div>
-            <table style="width:100%; border-collapse:collapse; font-size:11px;">
-                <thead>
-                    <tr style="background:#334155; color:#fff;">
-                        <th style="padding:6px 8px; text-align:left; width:35px;">#</th>
-                        <th style="padding:6px 8px; text-align:left;">তারিখ</th>
-                        <th style="padding:6px 8px; text-align:left;">মাধ্যম</th>
-                        <th style="padding:6px 8px; text-align:left;">ট্রানজেকশন আইডি</th>
-                        <th style="padding:6px 12px 6px 8px; text-align:right; width:110px;">আদায়কৃত (৳)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($sale->payments as $pIdx => $payment)
-                        <tr style="background:{{ $pIdx % 2 === 0 ? '#f8fafc' : '#fff' }}; border-bottom:1px solid #e2e8f0;">
-                            <td style="padding:5px 8px; color:#666;">{{ $pIdx + 1 }}</td>
-                            <td style="padding:5px 8px; color:#333;">{{ $payment->payment_date ? $payment->payment_date->format('d M, Y') : '—' }}</td>
-                            <td style="padding:5px 8px; color:#333;">{{ $payment->payment_method }}</td>
-                            <td style="padding:5px 8px; color:#666;">{{ $payment->transaction_id ?? '—' }}</td>
-                            <td style="padding:5px 12px 5px 8px; text-align:right; font-weight:700; color:#16a34a;">{{ number_format($payment->amount, 2) }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-        @endif
-
-        {{-- Footer with 50px signature space --}}
-        <div style="margin-top:28px; border-top:1px dashed #cbd5e1; padding-top:14px; display:flex; justify-content:space-between; align-items:flex-end;">
-            <div style="font-size:9.5px; color:#888; line-height:1.8;">
-                <div style="color:#0284c7; font-weight:700; font-size:10px; margin-bottom:3px;">🐟 সানা ফিশারিজ</div>
-                <div>মৎস্য বিক্রয়ের বিশ্বস্ত চালান নথি</div>
-                <div>🖨 কম্পিউটার প্রিন্টেড — স্বাক্ষরের প্রয়োজন নেই</div>
-                <div>মুদ্রণের সময়: {{ now()->format('h:i A, d M Y') }}</div>
-            </div>
-            <div style="text-align:center; font-size:10.5px; color:#555;">
-                <div style="height:50px;"></div>
-                <div style="border-top:1.5px solid #555; padding-top:5px; min-width:160px;">অনুমোদনকারীর স্বাক্ষর</div>
             </div>
         </div>
     </div>
@@ -385,8 +440,8 @@
                         <i class="fa-solid fa-hand-holding-dollar"></i>
                     </div>
                     <div>
-                        <h6 class="modal-title fw-bold text-dark mb-0">বকেয়া টাকা আদায় / পরিশোধ</h6>
-                        <small class="text-muted" style="font-size: 0.75rem;">চালান: {{ $sale->invoice_no }}</small>
+                        <h6 class="modal-title fw-bold text-dark mb-0">বকেয়া টাকা আদায় / জমা</h6>
+                        <small class="text-muted" style="font-size: 0.75rem;">চালান নম্বর: {{ $sale->invoice_no }}</small>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -406,7 +461,7 @@
                     <div class="row g-3">
                         <div class="col-12 col-md-6">
                             <label class="form-label fw-semibold text-secondary" style="font-size: 0.85rem;">
-                                পরিশোধের তারিখ <span class="text-danger">*</span>
+                                জমার তারিখ <span class="text-danger">*</span>
                             </label>
                             <input type="date" 
                                    name="payment_date" 
@@ -433,7 +488,7 @@
 
                         <div class="col-12 col-md-6">
                             <label class="form-label fw-semibold text-secondary" style="font-size: 0.85rem;">
-                                পরিশোধের মাধ্যম <span class="text-danger">*</span>
+                                জমার মাধ্যম <span class="text-danger">*</span>
                             </label>
                             <select name="payment_method" class="select2 form-select" required>
                                 <option value="Cash" selected>ক্যাশ (Cash)</option>
@@ -452,18 +507,18 @@
                             <input type="text" 
                                    name="transaction_id" 
                                    class="form-control" 
-                                   placeholder="যেমন: TRX12345" 
+                                   placeholder="e.g. TRX123456" 
                                    style="font-size: 0.88rem;">
                         </div>
 
                         <div class="col-12">
                             <label class="form-label fw-semibold text-secondary" style="font-size: 0.85rem;">
-                                মন্তব্য / নোট <small class="text-muted">(ঐচ্ছিক)</small>
+                                নোট / বিবরণ <small class="text-muted">(ঐচ্ছিক)</small>
                             </label>
                             <input type="text" 
                                    name="note" 
                                    class="form-control" 
-                                   placeholder="যেমন: কিস্তি বা বকেয়া আদায়" 
+                                   placeholder="আদায়ের মন্তব্য বা তথ্য..." 
                                    style="font-size: 0.88rem;">
                         </div>
                     </div>
@@ -482,34 +537,283 @@
     </div>
 </div>
 
+<!-- ================= STYLES FOR FULL A4 MEMO & PRINT ================= -->
 <style>
-@media print {
-    @page {
-        size: A4 portrait;
-        margin: 12mm 14mm 14mm 14mm;
+    /* Memo Container Dimensions */
+    .official-memo-wrapper {
+        width: 100%;
+        max-width: 860px;
+        background: #ffffff;
+        box-sizing: border-box;
     }
-    html, body {
-        background: #fff !important;
-        font-family: 'Inter', sans-serif !important;
-        font-size: 12px !important;
-        color: #111 !important;
+    .official-memo-border {
+        border: 2.5px solid #0284c7;
+        padding: 24px 26px;
+        position: relative;
+        background: #ffffff;
+        min-height: 1050px;
     }
-    .app-sidebar, .app-header, header, .toast-container,
-    .d-print-none, #addPaymentModal {
-        display: none !important;
+
+    /* Challan Badge */
+    .challan-badge {
+        background: #0f172a;
+        color: #ffffff;
+        font-weight: 800;
+        font-size: 11pt;
+        letter-spacing: 2px;
+        padding: 2px 20px;
+        border-radius: 4px;
+        border: 1px solid #1e293b;
     }
-    .main-content {
-        margin: 0 !important;
-        padding: 0 !important;
+
+    /* Logo Styling */
+    .memo-logo {
+        width: 90px;
+        height: 90px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
-    .w-100.pb-4 {
-        padding: 0 !important;
+    .logo-circle {
+        position: relative;
+        width: 86px;
+        height: 86px;
     }
-    #printableInvoice {
-        display: block !important;
+    .logo-svg {
+        width: 100%;
+        height: 100%;
     }
-    table { page-break-inside: auto; }
-    tr { page-break-inside: avoid; }
-}
+    .logo-inner-text {
+        position: absolute;
+        bottom: 6px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 8pt;
+        line-height: 1.1;
+        color: #0369a1;
+        font-weight: bold;
+    }
+
+    /* Memo Company Title */
+    .memo-company-title {
+        font-size: 28pt;
+        font-weight: 900;
+        color: #1e3a8a;
+        letter-spacing: -0.5px;
+        line-height: 1.15;
+        text-shadow: 1px 1px 0px #bae6fd;
+    }
+    .memo-subtitle {
+        font-size: 10.5pt;
+        color: #1e293b;
+    }
+    .memo-proprietor {
+        font-size: 10pt;
+        font-weight: bold;
+        color: #881337;
+    }
+
+    /* Operator & Contact Badges */
+    .operator-badge {
+        background: #1e3a8a;
+        color: #ffffff;
+        padding: 3px 14px;
+        border-radius: 4px;
+        font-size: 10pt;
+        font-weight: bold;
+    }
+    .contact-pill {
+        font-size: 10pt;
+        color: #0f172a;
+    }
+
+    /* Purple Address Banner */
+    .purple-address-banner {
+        background: #701a75;
+        color: #ffffff;
+        font-size: 9.5pt;
+        font-weight: 600;
+        padding: 7px 16px;
+        border-radius: 12px;
+        line-height: 1.45;
+        text-align: center;
+    }
+
+    /* Customer Info Table */
+    .customer-table {
+        border-collapse: collapse;
+        border: 2px solid #0284c7;
+    }
+    .customer-table td {
+        border: 1.5px solid #0284c7;
+        padding: 6px 10px;
+        font-size: 10.5pt;
+    }
+    .customer-label {
+        background-color: #0284c7;
+        color: #ffffff;
+        font-weight: bold;
+    }
+    .customer-value {
+        background-color: #ffffff;
+    }
+
+    /* Items Table */
+    .items-table-container {
+        border: 2px solid #0284c7;
+        position: relative;
+    }
+    .memo-items-table {
+        border-collapse: collapse;
+        position: relative;
+        z-index: 2;
+    }
+    .memo-items-table th {
+        background-color: #1e3a8a;
+        color: #ffffff;
+        font-weight: bold;
+        font-size: 10pt;
+        padding: 8px 8px;
+        border: 1.5px solid #0284c7;
+    }
+    .memo-items-table td {
+        border: 1.5px solid #0284c7;
+        padding: 8px 8px;
+        font-size: 10pt;
+    }
+    .item-row:nth-child(even) {
+        background: rgba(248, 250, 252, 0.5);
+    }
+
+    /* Watermark */
+    .watermark-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        z-index: 1;
+        pointer-events: none;
+        opacity: 0.12;
+    }
+    .watermark-text {
+        font-size: 16pt;
+        font-weight: 900;
+        color: #0284c7;
+        margin-top: 6px;
+        letter-spacing: 0.5px;
+    }
+
+    /* In-Words Box */
+    .in-words-box {
+        border: 2px solid #0284c7;
+        padding: 5px;
+        border-radius: 4px;
+    }
+    .in-words-label {
+        background-color: #0284c7;
+        color: #ffffff;
+        font-weight: bold;
+        padding: 5px 12px;
+        font-size: 10pt;
+        border-radius: 2px;
+        white-space: nowrap;
+    }
+    .in-words-value {
+        font-size: 10.5pt;
+    }
+
+    /* Summary Table (Bottom Right) */
+    .summary-table {
+        border-collapse: collapse;
+        border: 2px solid #0284c7;
+    }
+    .summary-table td {
+        border: 1.5px solid #0284c7;
+        padding: 5px 10px;
+        font-size: 10.5pt;
+    }
+    .summary-label {
+        background-color: #1e3a8a;
+        color: #ffffff;
+        font-weight: bold;
+        width: 85px;
+        text-align: center;
+    }
+    .summary-label.bg-danger-cell {
+        background-color: #b91c1c;
+    }
+    .summary-val {
+        background-color: #ffffff;
+    }
+
+    /* Slogan Banner */
+    .slogan-pill-banner {
+        background-color: #701a75;
+        color: #ffffff;
+        font-size: 10pt;
+        font-weight: bold;
+        padding: 5px 26px;
+        border-radius: 12px;
+        letter-spacing: 0.3px;
+    }
+
+    /* Signature Line */
+    .sig-line {
+        color: #64748b;
+        letter-spacing: -1px;
+        font-weight: bold;
+    }
+
+    /* ======================================================= */
+    /* FULL A4 PRINT SPECIFIC STYLES                          */
+    /* ======================================================= */
+    @media print {
+        @page {
+            size: A4 portrait;
+            margin: 10mm 10mm 10mm 10mm;
+        }
+        html, body {
+            background: #ffffff !important;
+            color: #000000 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+        }
+        .app-sidebar, .app-header, header, nav, .d-print-none, #addPaymentModal, footer {
+            display: none !important;
+        }
+        .main-content, .page, .w-100 {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+        .official-memo-wrapper {
+            box-shadow: none !important;
+            border: none !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            min-height: 265mm !important;
+        }
+        .official-memo-border {
+            border: 2px solid #0284c7 !important;
+            padding: 16px 18px !important;
+            min-height: 265mm !important;
+            box-sizing: border-box !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+        }
+        /* Ensure exact print colors */
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+    }
 </style>
 @endsection

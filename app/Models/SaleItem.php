@@ -16,6 +16,9 @@ class SaleItem extends Model
     protected $fillable = [
         'sales_id',
         'sale_product_id',
+        'box',
+        'poly',
+        'meer',
         'quantity',
         'unit',
         'unit_price',
@@ -47,5 +50,10 @@ class SaleItem extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(SaleProduct::class, 'sale_product_id');
+    }
+
+    public function getProductNameAttribute(): string
+    {
+        return $this->product?->name ?? '—';
     }
 }

@@ -80,7 +80,11 @@ class SalesController extends Controller
      */
     public function create(): View
     {
-        $customers = Customer::active()->with(['district', 'division', 'zone'])->orderBy('name')->get();
+        $customers = Customer::active()
+            ->with(['district', 'division', 'zone'])
+            ->withSum('sales as total_due', 'due_amount')
+            ->orderBy('name')
+            ->get();
         $products = SaleProduct::orderBy('name')->get();
         $divisions = Division::active()->orderBy('name')->get();
         $districts = District::with('division')->active()->orderBy('name')->get();
@@ -113,8 +117,11 @@ class SalesController extends Controller
             'customer_address' => ['nullable', 'string', 'max:500'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.sale_product_id' => ['required', 'distinct', 'exists:sale_products,id'],
+            'items.*.box' => ['nullable', 'string', 'max:50'],
+            'items.*.poly' => ['nullable', 'string', 'max:50'],
+            'items.*.meer' => ['nullable', 'string', 'max:50'],
             'items.*.quantity' => ['required', 'numeric', 'gt:0'],
-            'items.*.unit' => ['required', 'string', 'max:50'],
+            'items.*.unit' => ['nullable', 'string', 'max:50'],
             'items.*.unit_price' => ['required', 'numeric', 'min:0'],
             'paid_amount' => ['nullable', 'numeric', 'min:0'],
             'payment_method' => ['nullable', 'string', 'max:50'],
@@ -160,8 +167,11 @@ class SalesController extends Controller
 
                 $itemsData[] = [
                     'sale_product_id' => $item['sale_product_id'],
+                    'box' => $item['box'] ?? null,
+                    'poly' => $item['poly'] ?? null,
+                    'meer' => $item['meer'] ?? null,
                     'quantity' => $qty,
-                    'unit' => $item['unit'] ?? 'কেজি',
+                    'unit' => $item['unit'] ?? 'পিস',
                     'unit_price' => $price,
                     'total_price' => $lineTotal,
                 ];
@@ -230,7 +240,18 @@ class SalesController extends Controller
             'payments',
         ]);
 
-        return view('admin.pages.sales.show', compact('sale'));
+        // Customer's previous due (before this invoice)
+        $previousDue = 0;
+        if ($sale->customer_id) {
+            $previousDue = (float) Sales::where('customer_id', $sale->customer_id)
+                ->where('id', '<', $sale->id)
+                ->sum('due_amount');
+        }
+
+        $grandTotal = $sale->total_amount + $previousDue;
+        $totalOutstanding = $previousDue + $sale->due_amount;
+
+        return view('admin.pages.sales.show', compact('sale', 'previousDue', 'grandTotal', 'totalOutstanding'));
     }
 
     /**

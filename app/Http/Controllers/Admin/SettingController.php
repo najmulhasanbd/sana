@@ -48,6 +48,16 @@ class SettingController extends Controller
             'mobile' => 'nullable|string|max:50',
             'whatsapp' => 'nullable|string|max:50',
             'address' => 'nullable|string|max:500',
+            'memo_subtitle' => 'nullable|string|max:500',
+            'proprietor_name' => 'nullable|string|max:255',
+            'proprietor_mobile' => 'nullable|string|max:100',
+            'contact_numbers' => 'nullable|string|max:255',
+            'operator_name' => 'nullable|string|max:255',
+            'operator_contact' => 'nullable|string|max:100',
+            'nursing_point_address' => 'nullable|string|max:500',
+            'office_address' => 'nullable|string|max:500',
+            'memo_slogan' => 'nullable|string|max:255',
+            'memo_authority_signature' => 'nullable|string|max:255',
         ]);
 
         $data = $request->except(['_token', 'site_logo', 'site_favicon', '_method']);
