@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DistrictController;
 use App\Http\Controllers\Admin\DivisionController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\PasswordController;
+use App\Http\Controllers\Admin\PurchaseController;
 use App\Http\Controllers\Admin\PurchaseProductController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SupplierController;
@@ -42,6 +43,10 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
 
     // Purchase Products (ক্রয় পণ্য তালিকা - Modal CRUD)
     Route::resource('purchase-products', PurchaseProductController::class)->only(['index', 'store', 'update', 'destroy'])->names('admin.purchase-product');
+
+    // Purchases (মাছ ও পণ্য ক্রয় ও বকেয়া হিসাব)
+    Route::post('purchases/{purchase}/payments', [PurchaseController::class, 'addPayment'])->name('admin.purchase.payment.store');
+    Route::resource('purchases', PurchaseController::class)->only(['index', 'create', 'store', 'show', 'destroy'])->names('admin.purchase');
 
     // Location Management (Division, District, Zone)
     Route::patch('divisions/{division}/toggle-status', [DivisionController::class, 'toggleStatus'])->name('admin.division.toggle-status');

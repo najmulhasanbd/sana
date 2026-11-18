@@ -83,12 +83,25 @@
                 </a>
             </li>
 
-            <!-- Purchase Products (Direct Top-Level Menu for Quick Access) -->
-            <li class="nav-item {{ request()->routeIs('admin.purchase-product.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.purchase-product.index') }}">
-                    <i class="fa-solid fa-boxes-stacked"></i>
-                    <span>ক্রয় পণ্য</span>
-                </a>
+            <!-- Purchase Management (পণ্য ক্রয় ও হিসাব) -->
+            <li class="nav-item has-dropdown {{ request()->routeIs('admin.purchase.*') || request()->routeIs('admin.purchase-product.*') ? 'open' : '' }}">
+                <div class="dropdown-header">
+                    <i class="fa-solid fa-cart-flatbed"></i>
+                    <span>ক্রয় ব্যবস্থাপনা (Purchase)</span>
+                    <i class="fa-solid fa-chevron-right arrow"></i>
+                </div>
+                <ul class="submenu">
+                    <li class="{{ request()->routeIs('admin.purchase.index') ? 'active' : '' }}">
+                        <a href="{{ route('admin.purchase.index') }}" class="{{ request()->routeIs('admin.purchase.index') ? 'text-primary fw-bold' : '' }}">
+                            <i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>সকল ক্রয়ের তালিকা
+                        </a>
+                    </li>
+                    <li class="{{ request()->routeIs('admin.purchase-product.*') ? 'active' : '' }}">
+                        <a href="{{ route('admin.purchase-product.index') }}" class="{{ request()->routeIs('admin.purchase-product.*') ? 'text-primary fw-bold' : '' }}">
+                            <i class="fa-solid fa-circle-dot me-2" style="font-size: 7px;"></i>ক্রয় পণ্য তালিকা
+                        </a>
+                    </li>
+                </ul>
             </li>
 
             <!-- Farmers & Hatcheries -->

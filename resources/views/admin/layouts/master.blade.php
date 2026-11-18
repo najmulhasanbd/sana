@@ -60,6 +60,13 @@
       background-color: #0284c7;
       color: #fff;
     }
+    .select2-container--bootstrap-5 .select2-dropdown .select2-results__option[aria-disabled="true"],
+    .select2-container--bootstrap-5 .select2-dropdown .select2-results__option--disabled {
+      color: #94a3b8 !important;
+      background-color: #f8fafc !important;
+      cursor: not-allowed !important;
+      opacity: 0.7 !important;
+    }
   </style>
 </head>
 
