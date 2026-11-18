@@ -3,8 +3,12 @@
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\CustomerDueController;
+use App\Http\Controllers\Admin\DesignationController;
 use App\Http\Controllers\Admin\DistrictController;
 use App\Http\Controllers\Admin\DivisionController;
+use App\Http\Controllers\Admin\EmployeeAdvanceController;
+use App\Http\Controllers\Admin\EmployeeController;
+use App\Http\Controllers\Admin\EmployeeSalaryController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\PasswordController;
 use App\Http\Controllers\Admin\PurchaseController;
@@ -64,6 +68,21 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
     // Purchases (মাছ ও পণ্য ক্রয় ও বকেয়া হিসাব)
     Route::post('purchases/{purchase}/payments', [PurchaseController::class, 'addPayment'])->name('admin.purchase.payment.store');
     Route::resource('purchases', PurchaseController::class)->only(['index', 'create', 'store', 'show', 'destroy'])->names('admin.purchase');
+
+    // Staff / Employee Management (কর্মচারী ও বেতন-অগ্রিম হিসাব)
+    Route::patch('employees/{employee}/toggle-status', [EmployeeController::class, 'toggleStatus'])->name('admin.employee.toggle-status');
+    Route::resource('employees', EmployeeController::class)->names('admin.employee');
+
+    // Employee Advance (কর্মচারী অগ্রিম খাতা)
+    Route::post('employee-advances', [EmployeeAdvanceController::class, 'store'])->name('admin.employee-advance.store');
+    Route::delete('employee-advances/{advance}', [EmployeeAdvanceController::class, 'destroy'])->name('admin.employee-advance.destroy');
+
+    // Employee Salary (বেতন পরিশোধ ও ভাউচার)
+    Route::resource('employee-salaries', EmployeeSalaryController::class)->only(['index', 'create', 'store', 'show', 'destroy'])->names('admin.employee-salary');
+
+    // Designations (কর্মচারী পদবী ও কাজের ধরন - Modal CRUD)
+    Route::patch('designations/{designation}/toggle-status', [DesignationController::class, 'toggleStatus'])->name('admin.designation.toggle-status');
+    Route::resource('designations', DesignationController::class)->only(['index', 'store', 'update', 'destroy'])->names('admin.designation');
 
     // Location Management (Division, District, Zone)
     Route::patch('divisions/{division}/toggle-status', [DivisionController::class, 'toggleStatus'])->name('admin.division.toggle-status');

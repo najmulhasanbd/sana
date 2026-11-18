@@ -135,6 +135,32 @@
                 </ul>
             </li>
 
+            <!-- Staff & Payroll Management -->
+            <li class="nav-item has-dropdown {{ request()->routeIs('admin.employee.*') || request()->routeIs('admin.employee-salary.*') || request()->routeIs('admin.designation.*') ? 'open' : '' }}">
+                <div class="dropdown-header">
+                    <i class="fa-solid fa-users-gear"></i>
+                    <span>Staff Management</span>
+                    <i class="fa-solid fa-chevron-right arrow"></i>
+                </div>
+                <ul class="submenu">
+                    <li class="{{ request()->routeIs('admin.employee.index') ? 'active' : '' }}">
+                        <a href="{{ route('admin.employee.index') }}" class="{{ request()->routeIs('admin.employee.index') ? 'text-primary fw-bold' : '' }}">
+                            All Employees
+                        </a>
+                    </li>
+                    <li class="{{ request()->routeIs('admin.employee-salary.*') ? 'active' : '' }}">
+                        <a href="{{ route('admin.employee-salary.index') }}" class="{{ request()->routeIs('admin.employee-salary.*') ? 'text-primary fw-bold' : '' }}">
+                            Salary Payments
+                        </a>
+                    </li>
+                    <li class="{{ request()->routeIs('admin.designation.*') ? 'active' : '' }}">
+                        <a href="{{ route('admin.designation.index') }}" class="{{ request()->routeIs('admin.designation.*') ? 'text-primary fw-bold' : '' }}">
+                            Designations
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <!-- Accounts & Billing -->
             <!-- <li class="nav-item has-dropdown">
                 <div class="dropdown-header">
