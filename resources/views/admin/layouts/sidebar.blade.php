@@ -105,33 +105,26 @@
             </li>
 
             <!-- Sales Management -->
-            <li class="nav-item has-dropdown {{ request()->routeIs('admin.sale-product.*') ? 'open' : '' }}">
+            <li class="nav-item has-dropdown {{ request()->routeIs('admin.sales.*') || request()->routeIs('admin.sale-product.*') ? 'open' : '' }}">
                 <div class="dropdown-header">
                     <i class="fa-solid fa-boxes-packing"></i>
                     <span>Sales Management</span>
                     <i class="fa-solid fa-chevron-right arrow"></i>
                 </div>
                 <ul class="submenu">
+                    <li class="{{ request()->routeIs('admin.sales.index') ? 'active' : '' }}">
+                        <a href="{{ route('admin.sales.index') }}" class="{{ request()->routeIs('admin.sales.index') ? 'text-primary fw-bold' : '' }}">
+                            All Sales
+                        </a>
+                    </li>
+                    <li class="{{ request()->routeIs('admin.sales.create') ? 'active' : '' }}">
+                        <a href="{{ route('admin.sales.create') }}" class="{{ request()->routeIs('admin.sales.create') ? 'text-primary fw-bold' : '' }}">
+                            New Sale
+                        </a>
+                    </li>
                     <li class="{{ request()->routeIs('admin.sale-product.*') ? 'active' : '' }}">
                         <a href="{{ route('admin.sale-product.index') }}" class="{{ request()->routeIs('admin.sale-product.*') ? 'text-primary fw-bold' : '' }}">
                             Sale Products
-                        </a>
-                    </li>
-                </ul>
-            </li>
-
-            <!-- Farmers & Hatcheries -->
-            <li class="nav-item has-dropdown {{ request()->routeIs('admin.supplier.*') ? 'open' : '' }}">
-                <div class="dropdown-header">
-                    <i class="fa-solid fa-users"></i>
-                    <span>Farmers & Hatcheries</span>
-                    <i class="fa-solid fa-chevron-right arrow"></i>
-                </div>
-                <ul class="submenu">
-                    <li><a href="#"></i>Farmer Clients</a></li>
-                    <li class="{{ request()->routeIs('admin.supplier.*') ? 'active' : '' }}">
-                        <a href="{{ route('admin.supplier.index') }}" class="{{ request()->routeIs('admin.supplier.*') ? 'text-primary fw-bold' : '' }}">
-                            </i>Hatchery Suppliers
                         </a>
                     </li>
                 </ul>

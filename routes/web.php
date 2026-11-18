@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\PasswordController;
 use App\Http\Controllers\Admin\PurchaseController;
 use App\Http\Controllers\Admin\PurchaseProductController;
 use App\Http\Controllers\Admin\SaleProductController;
+use App\Http\Controllers\Admin\SalesController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\ZoneController;
@@ -47,6 +48,10 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
 
     // Sale Products (বিক্রয় পণ্য তালিকা - Modal CRUD)
     Route::resource('sale-products', SaleProductController::class)->only(['index', 'store', 'update', 'destroy'])->names('admin.sale-product');
+
+    // Sales (মাছ ও পণ্য বিক্রয় ও চালান)
+    Route::post('sales/{sale}/payments', [SalesController::class, 'addPayment'])->name('admin.sales.payment.store');
+    Route::resource('sales', SalesController::class)->only(['index', 'create', 'store', 'show', 'destroy'])->names('admin.sales');
 
     // Purchases (মাছ ও পণ্য ক্রয় ও বকেয়া হিসাব)
     Route::post('purchases/{purchase}/payments', [PurchaseController::class, 'addPayment'])->name('admin.purchase.payment.store');
