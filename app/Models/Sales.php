@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Sales extends Model
 {
@@ -59,6 +60,22 @@ class Sales extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(SalePayment::class, 'sales_id')->latest('payment_date')->latest('id');
+    }
+
+    /**
+     * @return HasMany<SmsLog>
+     */
+    public function smsLogs(): HasMany
+    {
+        return $this->hasMany(SmsLog::class, 'sales_id')->latest('id');
+    }
+
+    /**
+     * @return HasOne<SmsLog>
+     */
+    public function latestSms(): HasOne
+    {
+        return $this->hasOne(SmsLog::class, 'sales_id')->latestOfMany();
     }
 
     /**

@@ -174,6 +174,21 @@
                                     <i class="fa-solid fa-receipt text-muted" style="font-size: 0.8rem;"></i>
                                     <span>{{ $sale->invoice_no }}</span>
                                 </a>
+                                @if($sale->latestSms)
+                                    @if($sale->latestSms->status === 'sent')
+                                        <small class="badge bg-success-subtle text-success border border-success-subtle px-1.5 py-0.5 rounded mt-1 d-inline-flex align-items-center gap-1" style="font-size: 0.68rem;" title="মেমো SMS সফলভাবে পাঠানো হয়েছে ({{ $sale->latestSms->created_at->format('h:i A') }})">
+                                            <i class="fa-solid fa-comment-sms"></i> SMS প্রেরিত
+                                        </small>
+                                    @elseif($sale->latestSms->status === 'simulated')
+                                        <small class="badge bg-info-subtle text-info border border-info-subtle px-1.5 py-0.5 rounded mt-1 d-inline-flex align-items-center gap-1" style="font-size: 0.68rem;" title="টেস্ট মোডে SMS রেকর্ড">
+                                            <i class="fa-solid fa-flask"></i> Test SMS
+                                        </small>
+                                    @else
+                                        <small class="badge bg-danger-subtle text-danger border border-danger-subtle px-1.5 py-0.5 rounded mt-1 d-inline-flex align-items-center gap-1" style="font-size: 0.68rem;" title="SMS ব্যর্থ">
+                                            <i class="fa-solid fa-circle-exclamation"></i> SMS ব্যর্থ
+                                        </small>
+                                    @endif
+                                @endif
                             </td>
                             <td>
                                 <span class="text-muted small">

@@ -32,18 +32,18 @@
                     <i class="fa-solid fa-receipt"></i>
                     <span>দৈনিক খরচ</span>
                 </a>
-                <a href="{{ route('admin.report.profit-loss') }}" class="btn btn-outline-success rounded-pill px-3 py-2 fw-semibold shadow-sm d-flex align-items-center gap-1.5" style="font-size: 0.84rem;">
-                    <i class="fa-solid fa-chart-pie"></i>
-                    <span>লাভ-ক্ষতি রিপোর্ট</span>
+                <a href="{{ route('admin.cash-book.index') }}" class="btn btn-outline-success rounded-pill px-3 py-2 fw-semibold shadow-sm d-flex align-items-center gap-1.5" style="font-size: 0.84rem;">
+                    <i class="fa-solid fa-wallet"></i>
+                    <span>ক্যাশ ও আয়-ব্যয় খাতা</span>
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- 1. Hero 4 Top Stat Cards -->
+    <!-- 1. Hero 3 Top Stat Cards (মানুষের কাছে মোট বাকি, সর্বমোট বিক্রয়, মোট পোনা ক্রয়) -->
     <div class="row g-3 mb-4">
         <!-- 1. মানুষের কাছে সর্বমোট বাকি (Total Customer Due) - Prominently Highlighted -->
-        <div class="col-xxl-3 col-xl-6 col-md-6 col-sm-12">
+        <div class="col-12 col-md-4">
             <div class="card border-0 shadow-sm rounded-4 p-4 h-100 position-relative overflow-hidden" 
                  style="background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%); border-left: 5px solid #ef4444 !important;">
                 <div class="d-flex justify-content-between align-items-center mb-2">
@@ -72,7 +72,7 @@
         </div>
 
         <!-- 2. সর্বমোট বিক্রয় (Total Sales) -->
-        <div class="col-xxl-3 col-xl-6 col-md-6 col-sm-12">
+        <div class="col-12 col-md-4">
             <div class="card border-0 shadow-sm rounded-4 p-4 h-100 position-relative overflow-hidden"
                  style="background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); border-left: 5px solid #10b981 !important;">
                 <div class="d-flex justify-content-between align-items-center mb-2">
@@ -101,7 +101,7 @@
         </div>
 
         <!-- 3. মোট পোনা ক্রয় (Total Purchases) -->
-        <div class="col-xxl-3 col-xl-6 col-md-6 col-sm-12">
+        <div class="col-12 col-md-4">
             <div class="card border-0 shadow-sm rounded-4 p-4 h-100 position-relative overflow-hidden"
                  style="background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%); border-left: 5px solid #0284c7 !important;">
                 <div class="d-flex justify-content-between align-items-center mb-2">
@@ -128,41 +128,12 @@
                 </div>
             </div>
         </div>
-
-        <!-- 4. সর্বমোট আনুমানিক নিট লাভ / ক্ষতি (Net Profit / Loss) -->
-        <div class="col-xxl-3 col-xl-6 col-md-6 col-sm-12">
-            <div class="card border-0 shadow-sm rounded-4 p-4 h-100 position-relative overflow-hidden"
-                 style="background: {{ $isNetProfitPositive ? 'linear-gradient(135deg, #f0fdfa 0%, #ffffff 100%)' : 'linear-gradient(135deg, #fef2f2 0%, #ffffff 100%)' }}; border-left: 5px solid {{ $isNetProfitPositive ? '#0d9488' : '#e11d48' }} !important;">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="fw-bold text-uppercase" style="font-size: 0.78rem; letter-spacing: 0.5px; color: {{ $isNetProfitPositive ? '#0d9488' : '#e11d48' }};">
-                        <i class="fa-solid fa-scale-balanced me-1"></i>সর্বমোট নিট লাভ / ক্ষতি
-                    </span>
-                    <span class="badge rounded-pill px-2.5 py-1 fw-bold" 
-                          style="background-color: {{ $isNetProfitPositive ? 'rgba(13, 148, 136, 0.15)' : 'rgba(225, 29, 72, 0.15)' }}; color: {{ $isNetProfitPositive ? '#0d9488' : '#e11d48' }}; font-size: 0.72rem;">
-                        {{ $isNetProfitPositive ? 'নিট লাভ' : 'নিট ক্ষতি' }}
-                    </span>
-                </div>
-
-                <h2 class="fw-bold mb-1" style="color: {{ $isNetProfitPositive ? '#0d9488' : '#e11d48' }};">
-                    ৳ {{ number_format(abs($netProfit), 2) }}
-                </h2>
-
-                <div class="d-flex align-items-center justify-content-between mt-3 pt-2 border-top">
-                    <small class="text-muted" style="font-size: 0.78rem;">
-                        মোট ব্যয়: ৳ {{ number_format($totalOverallCosts, 2) }}
-                    </small>
-                    <a href="{{ route('admin.report.profit-loss') }}" class="fw-semibold text-decoration-none small" style="color: {{ $isNetProfitPositive ? '#0d9488' : '#e11d48' }}; font-size: 0.8rem;">
-                        পূর্ণাঙ্গ রিপোর্ট <i class="fa-solid fa-arrow-right ms-1"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
     </div>
 
-    <!-- 2. Today's and This Month's Quick Pulse (4 Cards) -->
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3 mb-4">
+    <!-- 2. Today's Quick Pulse (3 Cards: আজকের বিক্রয়, আজকের নগদ আদায়, আজকের খরচ) -->
+    <div class="row g-3 mb-4">
         <!-- Today's Sales -->
-        <div class="col">
+        <div class="col-12 col-md-4">
             <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
                 <div class="d-flex align-items-center gap-3">
                     <div class="rounded-3 d-flex align-items-center justify-content-center text-white flex-shrink-0"
@@ -178,7 +149,7 @@
         </div>
 
         <!-- Today's Cash Collection -->
-        <div class="col">
+        <div class="col-12 col-md-4">
             <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
                 <div class="d-flex align-items-center gap-3">
                     <div class="rounded-3 d-flex align-items-center justify-content-center text-white flex-shrink-0"
@@ -194,7 +165,7 @@
         </div>
 
         <!-- Today's Expense -->
-        <div class="col">
+        <div class="col-12 col-md-4">
             <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
                 <div class="d-flex align-items-center gap-3">
                     <div class="rounded-3 d-flex align-items-center justify-content-center text-white flex-shrink-0"
@@ -204,24 +175,6 @@
                     <div>
                         <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.72rem; letter-spacing: 0.5px;">আজকের খরচ</small>
                         <h5 class="fw-bold mb-0 text-dark">৳ {{ number_format($todayExpenses, 2) }}</h5>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- This Month's Net Profit -->
-        <div class="col">
-            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="rounded-3 d-flex align-items-center justify-content-center text-white flex-shrink-0"
-                         style="width: 44px; height: 44px; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);">
-                        <i class="fa-solid fa-chart-line fs-5"></i>
-                    </div>
-                    <div>
-                        <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.72rem; letter-spacing: 0.5px;">চলতি মাসের লাভ</small>
-                        <h5 class="fw-bold mb-0 {{ $monthNetProfit >= 0 ? 'text-success' : 'text-danger' }}">
-                            ৳ {{ number_format($monthNetProfit, 2) }}
-                        </h5>
                     </div>
                 </div>
             </div>

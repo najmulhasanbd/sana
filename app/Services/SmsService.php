@@ -22,6 +22,7 @@ class SmsService
         return [
             'sms_enabled' => (bool) Setting::get('sms_enabled', true),
             'sms_test_mode' => (bool) Setting::get('sms_test_mode', true),
+            'auto_sms_on_sale' => (bool) Setting::get('auto_sms_on_sale', true),
             'sms_gateway' => Setting::get('sms_gateway', 'sandbox'),
             'sms_api_key' => Setting::get('sms_api_key', ''),
             'sms_sender_id' => Setting::get('sms_sender_id', ''),
@@ -246,6 +247,7 @@ class SmsService
             '{total_amount}' => number_format((float) $sale->total_amount, 2),
             '{paid_amount}' => number_format((float) $sale->paid_amount, 2),
             '{due_amount}' => number_format((float) $sale->due_amount, 2),
+            '{total_due}' => $sale->customer ? number_format((float) $sale->customer->total_due_amount, 2) : number_format((float) $sale->due_amount, 2),
             '{company_name}' => $companyName,
             '{company_phone}' => $companyPhone,
         ];

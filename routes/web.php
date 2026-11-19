@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\CashBookController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\CustomerDueController;
 use App\Http\Controllers\Admin\DesignationController;
@@ -91,6 +92,9 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
 
     // Expenses (দৈনিক প্রাতিষ্ঠানিক অন্যান্য খরচ খাতা)
     Route::resource('expenses', ExpenseController::class)->names('admin.expense');
+
+    // Cash Book (আয়-ব্যয় ও ক্যাশ খাতা - সম্পূর্ণ স্বাধীন মডিউল)
+    Route::resource('cash-books', CashBookController::class)->only(['index', 'store', 'update', 'destroy'])->names('admin.cash-book');
 
     // Profit & Loss and Income vs Expense Report (আয়-ব্যয় ও লাভ-ক্ষতির হিসাব)
     Route::get('reports/profit-loss', [ProfitLossReportController::class, 'index'])->name('admin.report.profit-loss');

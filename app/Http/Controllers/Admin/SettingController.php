@@ -139,6 +139,7 @@ class SettingController extends Controller
         // Handle boolean switches like SMS enabled & Test mode
         $data['sms_enabled'] = $request->boolean('sms_enabled') ? '1' : '0';
         $data['sms_test_mode'] = $request->boolean('sms_test_mode') ? '1' : '0';
+        $data['auto_sms_on_sale'] = $request->boolean('auto_sms_on_sale') ? '1' : '0';
 
         // Save all text settings
         foreach ($data as $key => $value) {

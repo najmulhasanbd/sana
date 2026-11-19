@@ -465,7 +465,7 @@
                         </div>
 
                         <!-- Note -->
-                        <div class="mb-4">
+                        <div class="mb-3">
                             <label class="form-label fw-semibold text-secondary" style="font-size: 0.85rem;">
                                 মন্তব্য / নোট <small class="text-muted">(ঐচ্ছিক)</small>
                             </label>
@@ -474,6 +474,23 @@
                                       class="form-control" 
                                       placeholder="যেমন: মাছ ও পোনা পরিবহন সংক্রান্ত বিশেষ নোট..." 
                                       style="font-size: 0.85rem;">{{ old('note') }}</textarea>
+                        </div>
+
+                        <!-- Auto Send SMS Toggle -->
+                        <div class="mb-3 p-2.5 rounded-3 border bg-light-subtle d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-paper-plane text-primary fs-6"></i>
+                                <div>
+                                    <label class="form-check-label fw-bold text-dark mb-0 cursor-pointer" for="send_sms" style="font-size: 0.82rem;">
+                                        স্বয়ংক্রিয় মেমো SMS পাঠান
+                                    </label>
+                                    <small class="text-muted d-block" style="font-size: 0.72rem;">চালান তৈরির সাথে সাথেই কাস্টমারের মোবাইলে SMS চলে যাবে</small>
+                                </div>
+                            </div>
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" role="switch" name="send_sms" id="send_sms" value="1" 
+                                       {{ old('send_sms', \App\Models\Setting::get('auto_sms_on_sale', '1')) == '1' ? 'checked' : '' }} style="cursor: pointer;">
+                            </div>
                         </div>
 
                         <!-- Actions -->

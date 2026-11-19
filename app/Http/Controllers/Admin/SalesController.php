@@ -10,13 +10,18 @@ use App\Models\SaleProduct;
 use App\Models\Sales;
 use App\Models\Setting;
 use App\Models\Zone;
+use App\Services\SmsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class SalesController extends Controller
 {
+    public function __construct(
+        public SmsService $smsService
+    ) {}
     /**
      * Display a listing of sales.
      */
@@ -29,7 +34,7 @@ class SalesController extends Controller
         $toDate = $request->query('to_date');
 
         $query = Sales::query()
-            ->with(['customer.district', 'customer.division', 'items.product', 'payments'])
+            ->with(['customer.district', 'customer.division', 'items.product', 'payments', 'latestSms'])
             ->latest('sale_date')
             ->latest('id');
 
@@ -234,8 +239,40 @@ class SalesController extends Controller
             return $sale;
         });
 
+        // Automatically send SMS to the customer upon invoice generation
+        $sendSmsRequested = $request->boolean('send_sms', true);
+        $autoSmsEnabled = (bool) Setting::get('auto_sms_on_sale', true);
+        $smsSent = false;
+
+        if ($sendSmsRequested && $autoSmsEnabled && ! empty($sale->customer?->mobile)) {
+            try {
+                $template = Setting::get(
+                    'sms_template_sale',
+                    'প্রিয় {customer_name}, সানা ফিশারিজ থেকে আপনার মেমো #{invoice_no} তৈরি হয়েছে। মোট বিল: ৳{total_amount}, জমা: ৳{paid_amount}, বকেয়া: ৳{due_amount}। ধন্যবাদ!'
+                );
+
+                $message = $this->smsService->renderSaleTemplate($template, $sale);
+
+                $smsResult = $this->smsService->send(
+                    mobile: $sale->customer->mobile,
+                    message: $message,
+                    type: 'invoice_memo',
+                    customerId: $sale->customer->id,
+                    salesId: $sale->id
+                );
+
+                $smsSent = $smsResult['success'] ?? false;
+            } catch (\Throwable $e) {
+                Log::warning('Automatic Sale Memo SMS Dispatch Error: ' . $e->getMessage());
+            }
+        }
+
         if (function_exists('toastr')) {
-            toastr()->success("বিক্রয় সফলভাবে সংরক্ষিত হয়েছে! চালান নম্বর: {$sale->invoice_no}", 'সফল');
+            $msg = "বিক্রয় সফলভাবে সংরক্ষিত হয়েছে! চালান নম্বর: {$sale->invoice_no}";
+            if ($smsSent) {
+                $msg .= ' এবং কাস্টমারের মোবাইলে মেমো SMS স্বয়ংক্রিয়ভাবে পাঠানো হয়েছে।';
+            }
+            toastr()->success($msg, 'সফল');
         }
 
         return redirect()->route('admin.sales.show', $sale);
@@ -252,6 +289,8 @@ class SalesController extends Controller
             'customer.zone',
             'items.product',
             'payments',
+            'smsLogs',
+            'latestSms',
         ]);
 
         // Customer's previous due (before this invoice)

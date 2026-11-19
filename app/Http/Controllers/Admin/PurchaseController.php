@@ -84,6 +84,10 @@ class PurchaseController extends Controller
             'purchase_date' => ['required', 'date'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.purchase_product_id' => ['required', 'distinct', 'exists:purchase_products,id'],
+            'items.*.box' => ['nullable', 'string', 'max:50'],
+            'items.*.poly' => ['nullable', 'string', 'max:50'],
+            'items.*.meer' => ['nullable', 'string', 'max:50'],
+            'items.*.unit' => ['nullable', 'string', 'max:50'],
             'items.*.quantity' => ['required', 'numeric', 'gt:0'],
             'items.*.unit_price' => ['required', 'numeric', 'min:0'],
             'paid_amount' => ['nullable', 'numeric', 'min:0'],
@@ -111,11 +115,20 @@ class PurchaseController extends Controller
             foreach ($validated['items'] as $item) {
                 $qty = (float) $item['quantity'];
                 $price = (float) $item['unit_price'];
-                $lineTotal = round($qty * $price, 2);
+
+                // In hatchery fry nursery business, fry rate (দর) is per 1,000 fry (প্রতি হাজার পোনার দর).
+                // e.g. 21,000 fry @ 370 Tk/thousand = 7,770 Tk.
+                // For general goods, normal qty * price applies.
+                $isPerThousand = !empty($item['meer']) || in_array($item['unit'] ?? '', ['হাজার', 'পোনা']);
+                $lineTotal = $isPerThousand ? round(($qty * $price) / 1000, 2) : round($qty * $price, 2);
                 $totalAmount += $lineTotal;
 
                 $itemsData[] = [
                     'purchase_product_id' => $item['purchase_product_id'],
+                    'box' => $item['box'] ?? null,
+                    'poly' => $item['poly'] ?? null,
+                    'meer' => $item['meer'] ?? null,
+                    'unit' => $item['unit'] ?? 'পোনা',
                     'quantity' => $qty,
                     'unit_price' => $price,
                     'total_price' => $lineTotal,

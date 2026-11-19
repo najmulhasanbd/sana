@@ -440,6 +440,22 @@
                                     </div>
                                 </div>
 
+                                <!-- Auto Send SMS on Sale Creation -->
+                                <div class="col-12">
+                                    <div class="card border rounded-3 p-3 bg-light">
+                                        <div class="form-check form-switch mb-1">
+                                            <input class="form-check-input" type="checkbox" role="switch" id="auto_sms_on_sale" name="auto_sms_on_sale" value="1"
+                                                   {{ !isset($settings['auto_sms_on_sale']) || $settings['auto_sms_on_sale'] == '1' ? 'checked' : '' }}>
+                                            <label class="form-check-label fw-bold text-success" for="auto_sms_on_sale">
+                                                <i class="fa-solid fa-paper-plane me-1"></i> চালান তৈরির সাথে সাথে স্বয়ংক্রিয় মেমো এসএমএস প্রেরণ (Auto SMS on Invoice Creation)
+                                            </label>
+                                        </div>
+                                        <small class="text-muted" style="font-size: 0.8rem;">
+                                            এটি চালু থাকলে বিক্রয় চালান তৈরি হওয়ার সাথে সাথেই কাস্টমারের মোবাইলে স্বয়ংক্রিয়ভাবে মেমো এসএমএস চলে যাবে। আলাদা করে পরে পাঠাতে হবে না।
+                                        </small>
+                                    </div>
+                                </div>
+
                                 <!-- Gateway Selection -->
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold text-secondary" for="sms_gateway">

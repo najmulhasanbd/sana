@@ -280,4 +280,64 @@ class SalesTest extends TestCase
         $response->assertRedirect(route('admin.sales.index'));
         $this->assertDatabaseMissing('sales', ['id' => $sale->id]);
     }
+
+    public function test_automatic_sms_is_dispatched_on_invoice_creation(): void
+    {
+        $response = $this->actingAs($this->user)->post(route('admin.sales.store'), [
+            'customer_name' => 'মোমিনুল ইসলাম',
+            'customer_mobile' => '01755112233',
+            'sale_date' => now()->toDateString(),
+            'items' => [
+                [
+                    'sale_product_id' => $this->product1->id,
+                    'quantity' => 21000,
+                    'unit' => 'পোনা',
+                    'unit_price' => 370,
+                ],
+            ],
+            'paid_amount' => 5000,
+            'payment_method' => 'Cash',
+            'send_sms' => '1',
+        ]);
+
+        $sale = Sales::whereHas('customer', function ($q) {
+            $q->where('mobile', '01755112233');
+        })->first();
+
+        $this->assertNotNull($sale);
+        $this->assertDatabaseHas('sms_logs', [
+            'sales_id' => $sale->id,
+            'recipient' => '8801755112233',
+            'type' => 'invoice_memo',
+        ]);
+    }
+
+    public function test_automatic_sms_can_be_skipped_when_toggle_is_disabled(): void
+    {
+        $response = $this->actingAs($this->user)->post(route('admin.sales.store'), [
+            'customer_name' => 'কামাল হোসেন',
+            'customer_mobile' => '01999887766',
+            'sale_date' => now()->toDateString(),
+            'items' => [
+                [
+                    'sale_product_id' => $this->product1->id,
+                    'quantity' => 10,
+                    'unit' => 'কেজি',
+                    'unit_price' => 500,
+                ],
+            ],
+            'paid_amount' => 5000,
+            'payment_method' => 'Cash',
+            'send_sms' => '0',
+        ]);
+
+        $sale = Sales::whereHas('customer', function ($q) {
+            $q->where('mobile', '01999887766');
+        })->first();
+
+        $this->assertNotNull($sale);
+        $this->assertDatabaseMissing('sms_logs', [
+            'sales_id' => $sale->id,
+        ]);
+    }
 }

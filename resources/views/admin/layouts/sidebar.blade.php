@@ -127,6 +127,16 @@
                 <span>হিসাব ও ব্যয় (Finance)</span>
             </li>
 
+            <!-- Standalone Cash Book (ক্যাশ ও আয়-ব্যয় খাতা) -->
+            <li class="nav-item {{ request()->routeIs('admin.cash-book.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.cash-book.index') }}" class="nav-link-item">
+                    <div class="nav-icon-box">
+                        <i class="fa-solid fa-wallet text-success"></i>
+                    </div>
+                    <span class="nav-label">ক্যাশ ও আয়-ব্যয় খাতা</span>
+                </a>
+            </li>
+
             <!-- Accounts & Finance Dropdown -->
             <li class="nav-item has-dropdown {{ request()->routeIs('admin.expense.*') || request()->routeIs('admin.expense-category.*') || request()->routeIs('admin.report.profit-loss') ? 'open' : '' }}">
                 <div class="dropdown-header">

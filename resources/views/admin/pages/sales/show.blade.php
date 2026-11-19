@@ -38,6 +38,33 @@
                     <span>বকেয়া আদায় / জমা</span>
                 </button>
             @endif
+
+            <!-- SMS Delivery Status Indicator -->
+            @if($sale->latestSms)
+                @if($sale->latestSms->status === 'sent')
+                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill d-flex align-items-center gap-1.5 fw-bold" 
+                          title="এসএমএস সফলভাবে পৌঁছেছে ({{ $sale->latestSms->created_at->format('d/m/Y h:i A') }})" 
+                          style="font-size: 0.82rem;">
+                        <i class="fa-solid fa-circle-check text-success"></i>
+                        <span>SMS পাঠানো হয়েছে ({{ $sale->latestSms->created_at->format('h:i A') }})</span>
+                    </span>
+                @elseif($sale->latestSms->status === 'simulated')
+                    <span class="badge bg-info-subtle text-info border border-info-subtle px-3 py-2 rounded-pill d-flex align-items-center gap-1.5 fw-bold" 
+                          title="টেস্ট মোডে রেকর্ড করা হয়েছে (কোনো ব্যালেন্স চার্জ হয়নি)" 
+                          style="font-size: 0.82rem;">
+                        <i class="fa-solid fa-flask text-info"></i>
+                        <span>SMS রেকর্ড (টেস্ট মোড)</span>
+                    </span>
+                @else
+                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 rounded-pill d-flex align-items-center gap-1.5 fw-bold" 
+                          title="এসএমএস গেটওয়ে এরর বা ব্যালেন্স স্বল্পতার কারণে ব্যর্থ হয়েছে" 
+                          style="font-size: 0.82rem;">
+                        <i class="fa-solid fa-circle-xmark text-danger"></i>
+                        <span>SMS ব্যর্থ হয়েছে</span>
+                    </span>
+                @endif
+            @endif
+
             @if(!empty($sale->customer?->mobile))
                 <button type="button" 
                         class="btn btn-outline-info rounded-pill px-3 py-2 fw-semibold shadow-sm d-flex align-items-center gap-2" 
@@ -45,7 +72,7 @@
                         data-bs-target="#sendSaleSmsModal"
                         style="font-size: 0.85rem;">
                     <i class="fa-solid fa-paper-plane"></i>
-                    <span>মেমো SMS পাঠান</span>
+                    <span>{{ $sale->latestSms ? 'পুনরায় SMS পাঠান' : 'মেমো SMS পাঠান' }}</span>
                 </button>
             @endif
             <button type="button" onclick="window.print()" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold shadow-sm d-flex align-items-center gap-2" style="font-size: 0.85rem;">
@@ -54,6 +81,57 @@
             </button>
         </div>
     </div>
+
+    <!-- SMS Delivery Info Box (Screen Only) -->
+    @if($sale->latestSms)
+        <div class="card border-0 shadow-sm rounded-4 bg-white p-3 mb-4 d-print-none">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-2.5">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0" 
+                         style="width: 40px; height: 40px; background: {{ $sale->latestSms->status === 'sent' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : ($sale->latestSms->status === 'simulated' ? 'linear-gradient(135deg, #0284c7 0%, #0284c7 100%)' : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)') }};">
+                        <i class="fa-solid {{ $sale->latestSms->status === 'sent' ? 'fa-check-double' : ($sale->latestSms->status === 'simulated' ? 'fa-flask' : 'fa-triangle-exclamation') }} fs-6"></i>
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <span class="fw-bold text-dark" style="font-size: 0.88rem;">মেমো SMS স্ট্যাটাস:</span>
+                            @if($sale->latestSms->status === 'sent')
+                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-0.5 fw-semibold" style="font-size: 0.72rem;">
+                                    <i class="fa-solid fa-circle-check me-1"></i>সফলভাবে প্রেরিত (Delivered)
+                                </span>
+                            @elseif($sale->latestSms->status === 'simulated')
+                                <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2.5 py-0.5 fw-semibold" style="font-size: 0.72rem;">
+                                    <i class="fa-solid fa-flask me-1"></i>সিমুলেটেড (টেস্ট মোড চালু)
+                                </span>
+                            @else
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-0.5 fw-semibold" style="font-size: 0.72rem;">
+                                    <i class="fa-solid fa-triangle-exclamation me-1"></i>ব্যর্থ হয়েছে
+                                </span>
+                            @endif
+                        </div>
+                        <small class="text-muted d-block mt-0.5" style="font-size: 0.78rem;">
+                            মোবাইল: <strong class="text-dark">{{ $sale->latestSms->recipient }}</strong> | সময়: {{ $sale->latestSms->created_at->format('d/m/Y, h:i A') }} | গেটওয়ে: <span class="text-uppercase fw-semibold">{{ $sale->latestSms->gateway }}</span>
+                        </small>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 fw-semibold text-secondary" 
+                            data-bs-toggle="collapse" data-bs-target="#viewSmsContentCollapse" style="font-size: 0.8rem;">
+                        <i class="fa-regular fa-comment-dots me-1"></i> প্রেরিত SMS দেখুন
+                    </button>
+                    <a href="{{ route('admin.sms.index') }}" class="btn btn-sm btn-light border rounded-pill px-3 fw-semibold text-primary" style="font-size: 0.8rem;">
+                        <i class="fa-solid fa-clock-rotate-left me-1"></i> সকল SMS লগ
+                    </a>
+                </div>
+            </div>
+
+            <!-- Collapsible full SMS text -->
+            <div class="collapse mt-2.5 pt-2.5 border-top" id="viewSmsContentCollapse">
+                <small class="text-muted fw-semibold d-block mb-1" style="font-size: 0.72rem;">কাস্টমারের মোবাইলে প্রেরিত মেসেজ:</small>
+                <div class="p-2.5 bg-light rounded-3 text-dark border" style="font-size: 0.84rem; white-space: pre-wrap; font-family: inherit; line-height: 1.5;">{{ $sale->latestSms->message }}</div>
+            </div>
+        </div>
+    @endif
 
     <!-- Payment History Strip (Screen Only) -->
     @if($sale->payments->isNotEmpty())
@@ -186,25 +264,27 @@
                             </div>
                         </div>
 
-                        <!-- Invoice No & Operator Row -->
-                        <div class="d-flex justify-content-between align-items-center px-1 mb-2">
-                            <div class="memo-invoice-number fw-bold text-dark" style="font-size: 11pt;">
-                                চালান নং - <span class="text-primary fw-bolder">{{ $sale->invoice_no }}</span>
-                            </div>
-                            @if(!empty($operatorName) || !empty($operatorContact))
-                                <div class="d-flex align-items-center gap-2">
-                                    @if(!empty($operatorName))
-                                        <span class="operator-badge">পরিচালনায়: {{ $operatorName }}</span>
-                                    @endif
-                                    @if(!empty($operatorContact))
-                                        <span class="contact-pill">
-                                            <i class="fa-brands fa-whatsapp text-success me-1"></i>
-                                            <i class="fa-solid fa-phone text-primary me-1"></i>
-                                            <strong>{{ $operatorContact }}</strong>
-                                        </span>
-                                    @endif
+                        <!-- Invoice No & Operator Row (Left: Challan No | Center: Operator | Right: Contact) -->
+                        <div class="memo-sub-header-row px-1 mb-2">
+                            <div class="text-start">
+                                <div class="memo-invoice-number fw-bold text-dark" style="font-size: 11pt;">
+                                    চালান নং - <span class="text-primary fw-bolder">{{ $sale->invoice_no }}</span>
                                 </div>
-                            @endif
+                            </div>
+                            <div class="text-center">
+                                @if(!empty($operatorName))
+                                    <span class="operator-badge">পরিচালনায়: {{ $operatorName }}</span>
+                                @endif
+                            </div>
+                            <div class="text-end">
+                                @if(!empty($operatorContact))
+                                    <span class="contact-pill">
+                                        <i class="fa-brands fa-whatsapp text-success me-1"></i>
+                                        <i class="fa-solid fa-phone text-primary me-1"></i>
+                                        <strong>{{ $operatorContact }}</strong>
+                                    </span>
+                                @endif
+                            </div>
                         </div>
 
                         <!-- Purple Address Banner Box (Shows only if at least one address is set) -->
@@ -691,6 +771,14 @@
         color: #701a75;
     }
 
+    /* Sub-header row with Left, Exact Center, and Right alignment */
+    .memo-sub-header-row {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        width: 100%;
+    }
+
     /* Operator & Contact Badges */
     .operator-badge {
         background: #1e3a8a;
@@ -699,10 +787,14 @@
         border-radius: 4px;
         font-size: 10pt;
         font-weight: bold;
+        display: inline-block;
+        white-space: nowrap;
     }
     .contact-pill {
         font-size: 10pt;
         color: #0f172a;
+        display: inline-block;
+        white-space: nowrap;
     }
 
     /* Purple Address Banner */
