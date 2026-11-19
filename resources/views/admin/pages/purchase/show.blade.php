@@ -109,14 +109,25 @@
             {{-- Items Table --}}
             <div class="py-4 border-bottom">
                 <h6 class="fw-bold text-dark mb-3">ক্রয়কৃত পণ্যের বিবরণ</h6>
+                @php
+                    $hasPackaging = $purchase->items->contains(fn($i) => !empty($i->box) || !empty($i->poly) || !empty($i->meer));
+                @endphp
                 <div class="table-responsive">
                     <table class="table align-middle mb-0">
                         <thead class="bg-light table-light">
                             <tr>
-                                <th class="py-2 ps-3 text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem; width: 60px;">#</th>
+                                <th class="py-2 ps-3 text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem; width: 50px;">#</th>
                                 <th class="py-2 text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem;">পণ্যের নাম</th>
-                                <th class="py-2 text-secondary text-uppercase fw-semibold text-center" style="font-size: 0.75rem;">পরিমাণ</th>
-                                <th class="py-2 text-secondary text-uppercase fw-semibold text-end" style="font-size: 0.75rem;">একক দর (৳)</th>
+                                @if($hasPackaging)
+                                    <th class="py-2 text-secondary text-uppercase fw-semibold text-center" style="font-size: 0.75rem;">বক্স</th>
+                                    <th class="py-2 text-secondary text-uppercase fw-semibold text-center" style="font-size: 0.75rem;">পলি</th>
+                                    <th class="py-2 text-secondary text-uppercase fw-semibold text-center" style="font-size: 0.75rem;">মীর</th>
+                                    <th class="py-2 text-secondary text-uppercase fw-semibold text-center" style="font-size: 0.75rem;">মোট পোনা</th>
+                                    <th class="py-2 text-secondary text-uppercase fw-semibold text-end" style="font-size: 0.75rem;">দর (হাজার ৳)</th>
+                                @else
+                                    <th class="py-2 text-secondary text-uppercase fw-semibold text-center" style="font-size: 0.75rem;">পরিমাণ</th>
+                                    <th class="py-2 text-secondary text-uppercase fw-semibold text-end" style="font-size: 0.75rem;">একক দর (৳)</th>
+                                @endif
                                 <th class="py-2 pe-3 text-secondary text-uppercase fw-semibold text-end" style="font-size: 0.75rem;">মোট মূল্য (৳)</th>
                             </tr>
                         </thead>
@@ -125,8 +136,16 @@
                                 <tr>
                                     <td class="ps-3 text-muted fw-medium">{{ $index + 1 }}</td>
                                     <td><span class="fw-bold text-dark">{{ $item->product?->name ?? '—' }}</span></td>
-                                    <td class="text-center fw-semibold text-secondary">{{ number_format($item->quantity, 2) }}</td>
-                                    <td class="text-end fw-semibold text-secondary">৳{{ number_format($item->unit_price, 2) }}</td>
+                                    @if($hasPackaging)
+                                        <td class="text-center fw-semibold text-secondary">{{ $item->box ? $item->box . ' টি' : '—' }}</td>
+                                        <td class="text-center fw-semibold text-secondary">{{ $item->poly ? $item->poly . ' টি' : '—' }}</td>
+                                        <td class="text-center fw-semibold text-secondary">{{ $item->meer ? number_format($item->meer) : '—' }}</td>
+                                        <td class="text-center fw-bold text-primary">{{ number_format($item->quantity) }} {{ $item->unit ?? 'পোনা' }}</td>
+                                        <td class="text-end fw-semibold text-secondary">৳{{ number_format($item->unit_price, 2) }}</td>
+                                    @else
+                                        <td class="text-center fw-semibold text-secondary">{{ number_format($item->quantity, 2) }}</td>
+                                        <td class="text-end fw-semibold text-secondary">৳{{ number_format($item->unit_price, 2) }}</td>
+                                    @endif
                                     <td class="pe-3 text-end fw-bold text-dark">৳{{ number_format($item->total_price, 2) }}</td>
                                 </tr>
                             @endforeach
@@ -286,8 +305,16 @@
                     <tr style="background:#0284c7; color:#fff;">
                         <th style="padding:7px 8px; text-align:left; width:35px;">#</th>
                         <th style="padding:7px 8px; text-align:left;">পণ্যের নাম</th>
-                        <th style="padding:7px 8px; text-align:center; width:95px;">পরিমাণ</th>
-                        <th style="padding:7px 8px; text-align:right; width:105px;">একক দর (৳)</th>
+                        @if($hasPackaging)
+                            <th style="padding:7px 8px; text-align:center; width:55px;">বক্স</th>
+                            <th style="padding:7px 8px; text-align:center; width:55px;">পলি</th>
+                            <th style="padding:7px 8px; text-align:center; width:70px;">মীর</th>
+                            <th style="padding:7px 8px; text-align:center; width:95px;">মোট পোনা</th>
+                            <th style="padding:7px 8px; text-align:right; width:100px;">দর (হাজার ৳)</th>
+                        @else
+                            <th style="padding:7px 8px; text-align:center; width:95px;">পরিমাণ</th>
+                            <th style="padding:7px 8px; text-align:right; width:105px;">একক দর (৳)</th>
+                        @endif
                         <th style="padding:7px 12px 7px 8px; text-align:right; width:110px;">মোট মূল্য (৳)</th>
                     </tr>
                 </thead>
@@ -296,8 +323,16 @@
                         <tr style="background:{{ $i % 2 === 0 ? '#f8fafc' : '#fff' }}; border-bottom:1px solid #e2e8f0;">
                             <td style="padding:6px 8px; color:#666;">{{ $i + 1 }}</td>
                             <td style="padding:6px 8px; font-weight:600; color:#111;">{{ $item->product?->name ?? '—' }}</td>
-                            <td style="padding:6px 8px; text-align:center; color:#444;">{{ number_format($item->quantity, 2) }}</td>
-                            <td style="padding:6px 8px; text-align:right; color:#444;">{{ number_format($item->unit_price, 2) }}</td>
+                            @if($hasPackaging)
+                                <td style="padding:6px 8px; text-align:center; color:#444;">{{ $item->box ?: '—' }}</td>
+                                <td style="padding:6px 8px; text-align:center; color:#444;">{{ $item->poly ?: '—' }}</td>
+                                <td style="padding:6px 8px; text-align:center; color:#444;">{{ $item->meer ? number_format($item->meer) : '—' }}</td>
+                                <td style="padding:6px 8px; text-align:center; font-weight:700; color:#0284c7;">{{ number_format($item->quantity) }}</td>
+                                <td style="padding:6px 8px; text-align:right; color:#444;">{{ number_format($item->unit_price, 2) }}</td>
+                            @else
+                                <td style="padding:6px 8px; text-align:center; color:#444;">{{ number_format($item->quantity, 2) }}</td>
+                                <td style="padding:6px 8px; text-align:right; color:#444;">{{ number_format($item->unit_price, 2) }}</td>
+                            @endif
                             <td style="padding:6px 12px 6px 8px; text-align:right; font-weight:700; color:#111;">{{ number_format($item->total_price, 2) }}</td>
                         </tr>
                     @endforeach

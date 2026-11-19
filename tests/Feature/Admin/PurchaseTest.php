@@ -249,4 +249,55 @@ class PurchaseTest extends TestCase
         $response->assertRedirect(route('admin.purchase.index'));
         $this->assertDatabaseMissing('purchases', ['id' => $purchase->id]);
     }
+
+    public function test_can_store_purchase_with_box_poly_mir_packaging_calculation(): void
+    {
+        $response = $this->actingAs($this->user)->post(route('admin.purchase.store'), [
+            'supplier_id' => $this->supplier->id,
+            'purchase_date' => now()->toDateString(),
+            'items' => [
+                [
+                    'purchase_product_id' => $this->product1->id,
+                    'box' => 5,
+                    'poly' => 10,
+                    'meer' => 2100,
+                    'quantity' => 21000,
+                    'unit' => 'পোনা',
+                    'unit_price' => 370, // 21,000 fry @ 370 Tk/thousand = 7,770 Tk
+                ],
+            ],
+            'paid_amount' => 5000,
+            'payment_method' => 'Cash',
+            'note' => 'পোনা ক্রয় প্যাকেজিং ক্যালকুলেশন টেস্ট',
+        ]);
+
+        $response->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('purchases', [
+            'supplier_id' => $this->supplier->id,
+            'total_amount' => 7770,
+            'paid_amount' => 5000,
+            'due_amount' => 2770,
+            'payment_status' => 'partial',
+        ]);
+
+        $this->assertDatabaseHas('purchase_items', [
+            'purchase_product_id' => $this->product1->id,
+            'box' => '5',
+            'poly' => '10',
+            'meer' => '2100',
+            'quantity' => 21000,
+            'unit' => 'পোনা',
+            'unit_price' => 370,
+            'total_price' => 7770,
+        ]);
+
+        $purchase = Purchase::where('supplier_id', $this->supplier->id)->latest('id')->first();
+        $showResponse = $this->actingAs($this->user)->get(route('admin.purchase.show', $purchase));
+        $showResponse->assertStatus(200);
+        $showResponse->assertSee('বক্স');
+        $showResponse->assertSee('পলি');
+        $showResponse->assertSee('মীর');
+        $showResponse->assertSee('মোট পোনা');
+        $showResponse->assertSee('21,000');
+    }
 }

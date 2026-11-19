@@ -371,7 +371,7 @@
 
             <!-- Right Side: Calculation & Payment Summary (Matching Challan Exactly) -->
             <div class="col-12 col-xl-4">
-                <div class="card border-0 shadow-sm rounded-4 bg-white sticky-top overflow-hidden" style="top: 20px;">
+                <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
                     <div class="card-header bg-white border-bottom p-3 p-md-4">
                         <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
                             <i class="fa-solid fa-calculator text-primary"></i>
