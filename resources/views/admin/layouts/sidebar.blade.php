@@ -1,17 +1,19 @@
 @php
     $sidebarLogo = \App\Models\Setting::get('site_logo');
     $sidebarBusinessName = \App\Models\Setting::get('business_name', 'সানা ফিশারিজ');
-    $sidebarTagline = \App\Models\Setting::get('site_tagline') ?: \App\Models\Setting::get('business_type', 'Fish Fry & Hatchery Hub');
+    $sidebarTagline = \App\Models\Setting::get('site_tagline') ?: \App\Models\Setting::get('business_type', 'বাগদার পোনা নার্সিং ও মৎস্য হ্যাচারি');
     $hasSidebarLogo = !empty($sidebarLogo) && file_exists(public_path($sidebarLogo));
+    $defaultLogo = 'admin/images/sana-fisheries-logo.svg';
+    $resolvedLogo = $hasSidebarLogo ? $sidebarLogo : (file_exists(public_path($defaultLogo)) ? $defaultLogo : null);
 @endphp
 
 <aside class="app-sidebar shadow-lg" id="app-sidebar">
     <!-- Sidebar Brand / Logo Header (Dynamic from Settings) -->
-    <div class="sidebar-header px-3 py-3 border-bottom border-white border-opacity-10 d-flex align-items-center">
+    <div class="sidebar-header px-3 border-bottom border-white border-opacity-10 d-flex align-items-center">
         <a href="{{ route('admin.dashboard') }}" class="logo text-decoration-none d-flex align-items-center gap-2.5 w-100">
-            @if($hasSidebarLogo)
-                <div class="brand-logo-box rounded-3 d-flex align-items-center justify-content-center flex-shrink-0 overflow-hidden bg-white bg-opacity-10 p-1 border border-white border-opacity-15">
-                    <img src="{{ asset($sidebarLogo) }}" alt="{{ $sidebarBusinessName }}" class="brand-logo-img">
+            @if($resolvedLogo)
+                <div class="brand-logo-box rounded-3 d-flex align-items-center justify-content-center flex-shrink-0">
+                    <img src="{{ asset($resolvedLogo) }}" alt="{{ $sidebarBusinessName }}" class="brand-logo-img">
                 </div>
             @else
                 <div class="brand-icon-box rounded-3 d-flex align-items-center justify-content-center text-white flex-shrink-0">
@@ -19,13 +21,10 @@
                 </div>
             @endif
             <div class="logo-text text-start overflow-hidden flex-grow-1">
-                <div class="d-flex align-items-center justify-content-between gap-1">
-                    <h6 class="m-0 fw-bold text-white text-truncate tracking-tight" style="font-size: 0.95rem; letter-spacing: -0.2px;" title="{{ $sidebarBusinessName }}">
-                        {{ $sidebarBusinessName }}
-                    </h6>
-                    <span class="badge bg-primary bg-opacity-25 border border-primary border-opacity-25 rounded-pill px-1.5 py-0.5 flex-shrink-0" style="font-size: 0.62rem; color: #38bdf8 !important;">PRO</span>
-                </div>
-                <small class="d-block text-truncate" style="font-size: 0.7rem; color: #38bdf8 !important;" title="{{ $sidebarTagline }}">
+                <h6 class="m-0 fw-bold text-white text-truncate tracking-tight" style="font-size: 0.94rem; line-height: 1.25;" title="{{ $sidebarBusinessName }}">
+                    {{ $sidebarBusinessName }}
+                </h6>
+                <small class="d-block text-truncate mt-0.5" style="font-size: 0.69rem; color: #38bdf8; font-weight: 500; opacity: 0.9;" title="{{ $sidebarTagline }}">
                     {{ $sidebarTagline }}
                 </small>
             </div>
@@ -429,7 +428,7 @@
     /* Modern Tree-Lined Submenu */
     .submenu {
         margin: 4px 10px 6px 25px !important;
-        padding: 4px 0 4px 10px !important;
+        /* padding: 4px 0 4px 10px !important; */
         border-left: 1.5px solid rgba(56, 189, 248, 0.2) !important;
         background: transparent !important;
         list-style: none !important;

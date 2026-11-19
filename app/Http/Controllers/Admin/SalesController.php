@@ -8,6 +8,7 @@ use App\Models\District;
 use App\Models\Division;
 use App\Models\SaleProduct;
 use App\Models\Sales;
+use App\Models\Setting;
 use App\Models\Zone;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -90,6 +91,10 @@ class SalesController extends Controller
         $districts = District::with('division')->active()->orderBy('name')->get();
         $zones = Zone::with('district')->active()->orderBy('name')->get();
         $nextInvoiceNo = Sales::generateInvoiceNo();
+        $defaultPolyPerBox = (float) Setting::get('default_poly_per_box', Setting::get('poly_per_box', 2));
+        $defaultMirPerPoly = (float) Setting::get('default_qty_per_poly', Setting::get('mir_per_poly', 2100));
+        $rawMirPresets = Setting::get('mir_preset_options', '1800, 1900, 2000, 2100, 2200, 2300, 2400, 2500');
+        $mirPresets = array_values(array_filter(array_map('trim', explode(',', $rawMirPresets))));
 
         return view('admin.pages.sales.create', compact(
             'customers',
@@ -97,7 +102,10 @@ class SalesController extends Controller
             'divisions',
             'districts',
             'zones',
-            'nextInvoiceNo'
+            'nextInvoiceNo',
+            'defaultPolyPerBox',
+            'defaultMirPerPoly',
+            'mirPresets'
         ));
     }
 
@@ -162,7 +170,13 @@ class SalesController extends Controller
             foreach ($validated['items'] as $item) {
                 $qty = (float) $item['quantity'];
                 $price = (float) $item['unit_price'];
-                $lineTotal = round($qty * $price, 2);
+
+                // In hatchery shrimp fry nursery business (বাগদা পোনা নার্সিং),
+                // fry rate (দর) is per 1,000 fry (প্রতি হাজার পোনার দর).
+                // e.g. 21,000 fry @ 370 Tk/thousand = 7,770 Tk.
+                // For general goods with unit কেজি, মণ, normal qty * price applies.
+                $isPerThousand = in_array($item['unit'] ?? 'পিস', ['পিস', 'হাজার', 'পোনা']);
+                $lineTotal = $isPerThousand ? round(($qty * $price) / 1000, 2) : round($qty * $price, 2);
                 $totalAmount += $lineTotal;
 
                 $itemsData[] = [

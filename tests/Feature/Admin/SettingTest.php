@@ -52,6 +52,9 @@ test('user can save memo and challan settings', function () {
         'nursing_point_address' => 'শ্রীউলা, আশাশুনি',
         'office_address' => 'বাল্লা বাজার, আশাশুনি',
         'memo_slogan' => 'সততাই ব্যবসার মূল লক্ষ্য',
+        'default_poly_per_box' => 6,
+        'default_qty_per_poly' => 10000,
+        'mir_preset_options' => '৮ মীর, ১০ মীর, ১২ মীর',
     ]);
 
     $response->assertRedirect(route('setting.index'));
@@ -59,6 +62,8 @@ test('user can save memo and challan settings', function () {
     expect(Setting::get('memo_business_name'))->toBe('মেসার্স সানা ফিস নার্সিং');
     expect(Setting::get('proprietor_name'))->toBe('নজরুল ইসলাম');
     expect(Setting::get('nursing_point_address'))->toBe('শ্রীউলা, আশাশুনি');
+    expect(Setting::get('default_poly_per_box'))->toBe('6');
+    expect(Setting::get('mir_preset_options'))->toBe('৮ মীর, ১০ মীর, ১২ মীর');
 });
 
 test('authenticated user can view password change page', function () {

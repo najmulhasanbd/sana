@@ -170,18 +170,17 @@
                                     </div>
                                 @endif
                                 @if(!empty($proprietorName) || !empty($proprietorMobile) || !empty($contactNumbers))
-                                    <div class="memo-proprietor mt-1">
-                                        (
-                                        @if(!empty($proprietorName))
-                                            প্রোপাইটার: {{ $proprietorName }}
-                                        @endif
-                                        @if(!empty($proprietorMobile))
-                                            ({{ $proprietorMobile }})
+                                    <div class="memo-proprietor mt-1 text-center">
+                                        @if(!empty($proprietorName) || !empty($proprietorMobile))
+                                            <div class="proprietor-line">
+                                                (প্রোপাইটার: {{ $proprietorName }}@if(!empty($proprietorMobile)) ({{ $proprietorMobile }})@endif)
+                                            </div>
                                         @endif
                                         @if(!empty($contactNumbers))
-                                            &nbsp;&nbsp;(যোগাযোগ: {{ $contactNumbers }})
+                                            <div class="contact-line mt-0.5">
+                                                (যোগাযোগ: {{ $contactNumbers }})
+                                            </div>
                                         @endif
-                                        )
                                     </div>
                                 @endif
                             </div>
@@ -246,14 +245,7 @@
                         </table>
                     </div>
 
-                    <!-- DYNAMIC ITEMS TABLE (Columns based on item data, rows exactly match item count) -->
-                    @php
-                        $hasBox = $sale->items->contains(fn($it) => !empty($it->box) && $it->box != '0' && $it->box !== '—');
-                        $hasPoly = $sale->items->contains(fn($it) => !empty($it->poly) && $it->poly != '0' && $it->poly !== '—');
-                        $hasMeer = $sale->items->contains(fn($it) => !empty($it->meer) && $it->meer != '0' && $it->meer !== '—');
-                        $hasCustomUnit = $sale->items->contains(fn($it) => !empty($it->unit) && !in_array(trim($it->unit), ['পিস', 'piece', 'pcs', 'টি', '']));
-                        $colCount = 3 + ($hasBox ? 1 : 0) + ($hasPoly ? 1 : 0) + ($hasMeer ? 1 : 0) + ($hasCustomUnit ? 1 : 0);
-                    @endphp
+                    <!-- DYNAMIC ITEMS TABLE MATCHING PHYSICAL CHALLAN PAD -->
                     <div class="items-table-container position-relative mb-3">
                         <!-- Faint Center Watermark -->
                         <div class="watermark-overlay" aria-hidden="true">
@@ -274,65 +266,62 @@
                             <div class="watermark-text">{{ $memoBusinessName }}</div>
                         </div>
 
-                        <!-- Items Table -->
+                        <!-- Items Table (Exact 7 Columns matching the pad: ব্র্যান্ড | বক্স | পলি | মীর | মোট পোনা | দর | মোট দাম) -->
                         <table class="memo-items-table w-100">
                             <thead>
                                 <tr>
-                                    <th>ব্র্যান্ড / পোনার নাম</th>
-                                    @if($hasBox)
-                                        <th style="width: 80px; text-align: center;">বক্স</th>
-                                    @endif
-                                    @if($hasPoly)
-                                        <th style="width: 80px; text-align: center;">পলি</th>
-                                    @endif
-                                    @if($hasMeer)
-                                        <th style="width: 85px; text-align: center;">মীর</th>
-                                    @endif
-                                    <th style="width: 110px; text-align: center;">মোট পোনা</th>
-                                    @if($hasCustomUnit)
-                                        <th style="width: 80px; text-align: center;">একক</th>
-                                    @endif
-                                    <th style="width: 105px; text-align: right;">দর (৳)</th>
-                                    <th style="width: 125px; text-align: right;">মোট দাম (৳)</th>
+                                    <th class="col-brand">ব্র্যান্ড</th>
+                                    <th class="col-box text-center">বক্স</th>
+                                    <th class="col-poly text-center">পলি</th>
+                                    <th class="col-meer text-center">মীর</th>
+                                    <th class="col-qty text-center">মোট পোনা</th>
+                                    <th class="col-rate text-center">দর</th>
+                                    <th class="col-total text-center">মোট দাম</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($sale->items as $item)
                                     <tr class="item-row">
-                                        <td class="text-start ps-3 fw-bold text-dark">
+                                        <td class="col-brand text-start ps-3 fw-bold text-dark">
                                             {{ $item->product?->name ?? $item->product_name }}
                                         </td>
-                                        @if($hasBox)
-                                            <td class="text-center">{{ $item->box ?: '—' }}</td>
-                                        @endif
-                                        @if($hasPoly)
-                                            <td class="text-center">{{ $item->poly ?: '—' }}</td>
-                                        @endif
-                                        @if($hasMeer)
-                                            <td class="text-center">{{ $item->meer ?: '—' }}</td>
-                                        @endif
-                                        <td class="text-center fw-bold text-dark">
+                                        <td class="col-box text-center">{{ $item->box ?: '' }}</td>
+                                        <td class="col-poly text-center">{{ $item->poly ?: '' }}</td>
+                                        <td class="col-meer text-center">{{ $item->meer ?: '' }}</td>
+                                        <td class="col-qty text-center fw-bold text-dark">
                                             {{ number_format($item->quantity) }}
                                         </td>
-                                        @if($hasCustomUnit)
-                                            <td class="text-center text-muted">
-                                                {{ $item->unit ?: 'পিস' }}
-                                            </td>
-                                        @endif
-                                        <td class="text-end pe-2">
+                                        <td class="col-rate text-end pe-2">
                                             {{ number_format($item->unit_price, 2) }}
                                         </td>
-                                        <td class="text-end pe-2 fw-bold text-dark">
+                                        <td class="col-total text-end pe-2 fw-bold text-dark">
                                             {{ number_format($item->total_price, 2) }}
                                         </td>
                                     </tr>
                                 @empty
-                                    <tr>
-                                        <td colspan="{{ $colCount }}" class="text-center py-3 text-muted">
+                                    <tr class="item-row">
+                                        <td colspan="5" class="text-center py-3 text-muted">
                                             কোনো পণ্য আইটেম পাওয়া যায়নি।
                                         </td>
                                     </tr>
                                 @endforelse
+
+                                {{-- Fill remaining rows so the table has full memo pad height while guaranteeing 1 single page --}}
+                                @php
+                                    $itemCount = $sale->items->count();
+                                    $emptyRowsCount = max(0, 6 - $itemCount);
+                                @endphp
+                                @for($i = 0; $i < $emptyRowsCount; $i++)
+                                    <tr class="empty-item-row">
+                                        <td class="col-brand py-2">&nbsp;</td>
+                                        <td class="col-box">&nbsp;</td>
+                                        <td class="col-poly">&nbsp;</td>
+                                        <td class="col-meer">&nbsp;</td>
+                                        <td class="col-qty">&nbsp;</td>
+                                        <td class="col-rate">&nbsp;</td>
+                                        <td class="col-total">&nbsp;</td>
+                                    </tr>
+                                @endfor
                             </tbody>
                         </table>
                     </div>
@@ -341,26 +330,31 @@
                 <!-- LOWER SECTION: TOTALS, IN WORDS, SLOGAN & SIGNATURES -->
                 <div class="memo-bottom-block">
                     <!-- TOTALS & PREVIOUS DUE CALCULATION SECTION -->
-                    <div class="memo-bottom-section d-flex justify-content-between align-items-start gap-3 mb-3">
+                    <div class="memo-bottom-section d-flex justify-content-between align-items-end gap-3 mb-3">
                         <!-- Left: In Words (টাকা কথায়) & Note -->
-                        <div class="in-words-container flex-grow-1">
-                            <div class="in-words-box d-flex align-items-center mb-2">
+                        <div class="in-words-container flex-grow-1 align-self-end">
+                            <div class="in-words-box d-flex align-items-stretch">
                                 <div class="in-words-label">টাকা (কথায়):</div>
                                 <div class="in-words-value flex-grow-1 ps-2 fw-bold text-dark">
-                                    {{ \App\Helpers\BanglaNumberHelper::bnWords(($previousDue ?? 0) > 0 ? ($grandTotal ?? $sale->total_amount) : $sale->total_amount) }}
+                                    @php
+                                        $wordsAmount = ($totalOutstanding ?? $sale->due_amount) > 0 
+                                            ? ($totalOutstanding ?? $sale->due_amount) 
+                                            : (($grandTotal ?? 0) > 0 ? $grandTotal : $sale->total_amount);
+                                    @endphp
+                                    {{ \App\Helpers\BanglaNumberHelper::bnWords($wordsAmount) }}
                                 </div>
                             </div>
 
                             @if(!empty($sale->note))
-                                <div class="memo-note-box p-2 border rounded-2 bg-light">
+                                <div class="memo-note-box p-2 border rounded-2 bg-light mt-2">
                                     <small class="fw-bold text-muted d-block">মন্তব্য / নোট:</small>
                                     <span class="text-dark small">{{ $sale->note }}</span>
                                 </div>
                             @endif
                         </div>
 
-                        <!-- Right: Summary Table (মোট, পূর্ব জের, সর্বমোট, জমা, পাওনা - শর্তসাপেক্ষ ডায়নামিক) -->
-                        <div class="summary-table-container" style="width: 250px;">
+                        <!-- Right: Summary Table (মোট, পূর্ব জের, সর্বমোট, জমা, পাওনা - matching the printed pad exactly) -->
+                        <div class="summary-table-container flex-shrink-0" style="width: 250px;">
                             <table class="w-100 summary-table">
                                 <tr>
                                     <td class="summary-label">মোট:</td>
@@ -368,46 +362,30 @@
                                         {{ number_format($sale->total_amount, 2) }}
                                     </td>
                                 </tr>
-                                @if(($previousDue ?? 0) > 0)
-                                    <tr>
-                                        <td class="summary-label">পূর্ব জের:</td>
-                                        <td class="summary-val text-end pe-2 fw-bold text-secondary">
-                                            {{ number_format($previousDue, 2) }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="summary-label">সর্বমোট:</td>
-                                        <td class="summary-val text-end pe-2 fw-bold text-dark" style="background:#f8fafc;">
-                                            {{ number_format($grandTotal ?? $sale->total_amount, 2) }}
-                                        </td>
-                                    </tr>
-                                @endif
-                                @if($sale->paid_amount > 0)
-                                    <tr>
-                                        <td class="summary-label">জমা:</td>
-                                        <td class="summary-val text-end pe-2 fw-bold text-success">
-                                            {{ number_format($sale->paid_amount, 2) }}
-                                        </td>
-                                    </tr>
-                                @endif
-                                @php
-                                    $dueBalance = (float)($totalOutstanding ?? $sale->due_amount);
-                                @endphp
-                                @if($dueBalance > 0)
-                                    <tr>
-                                        <td class="summary-label bg-danger-cell">পাওনা:</td>
-                                        <td class="summary-val text-end pe-2 fw-bolder text-danger" style="background:#fef2f2;">
-                                            {{ number_format($dueBalance, 2) }}
-                                        </td>
-                                    </tr>
-                                @elseif($sale->paid_amount > 0 && $dueBalance <= 0)
-                                    <tr>
-                                        <td class="summary-label bg-success text-white">অবস্থা:</td>
-                                        <td class="summary-val text-end pe-2 fw-bold text-success" style="background:#f0fdf4;">
-                                            <i class="fa-solid fa-circle-check me-1"></i>পরিশোধিত
-                                        </td>
-                                    </tr>
-                                @endif
+                                <tr>
+                                    <td class="summary-label">পূর্ব জের:</td>
+                                    <td class="summary-val text-end pe-2 fw-bold text-secondary">
+                                        {{ number_format($previousDue ?? 0, 2) }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="summary-label">সর্বমোট:</td>
+                                    <td class="summary-val text-end pe-2 fw-bold text-dark" style="background:#f8fafc;">
+                                        {{ number_format($grandTotal ?? ($sale->total_amount + ($previousDue ?? 0)), 2) }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="summary-label">জমা:</td>
+                                    <td class="summary-val text-end pe-2 fw-bold text-success">
+                                        {{ number_format($sale->paid_amount, 2) }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="summary-label bg-danger-cell">পাওনা:</td>
+                                    <td class="summary-val text-end pe-2 fw-bolder text-danger" style="background:#fef2f2;">
+                                        {{ number_format($totalOutstanding ?? $sale->due_amount, 2) }}
+                                    </td>
+                                </tr>
                             </table>
                         </div>
                     </div>
@@ -628,16 +606,18 @@
     /* Memo Container Dimensions */
     .official-memo-wrapper {
         width: 100%;
-        max-width: 860px;
+        max-width: 850px;
         background: #ffffff;
         box-sizing: border-box;
     }
     .official-memo-border {
-        border: 2.5px solid #0284c7;
-        padding: 24px 26px;
+        border: 3px solid #0284c7;
+        outline: 1.5px solid #38bdf8;
+        outline-offset: -5px;
+        padding: 20px 22px;
         position: relative;
         background: #ffffff;
-        min-height: 1050px;
+        min-height: 980px;
     }
 
     /* Challan Badge */
@@ -696,8 +676,19 @@
     }
     .memo-proprietor {
         font-size: 10pt;
-        font-weight: bold;
-        color: #881337;
+        font-weight: 700;
+        color: #701a75;
+        line-height: 1.35;
+    }
+    .proprietor-line {
+        font-size: 10.5pt;
+        font-weight: 700;
+        color: #701a75;
+    }
+    .contact-line {
+        font-size: 10pt;
+        font-weight: 700;
+        color: #701a75;
     }
 
     /* Operator & Contact Badges */
@@ -745,34 +736,14 @@
         background-color: #ffffff;
     }
 
-    /* Items Table */
+    /* Items Table & Watermark */
     .items-table-container {
         border: 2px solid #0284c7;
         position: relative;
+        background: #ffffff;
+        min-height: 360px;
+        overflow: hidden;
     }
-    .memo-items-table {
-        border-collapse: collapse;
-        position: relative;
-        z-index: 2;
-    }
-    .memo-items-table th {
-        background-color: #1e3a8a;
-        color: #ffffff;
-        font-weight: bold;
-        font-size: 10pt;
-        padding: 8px 8px;
-        border: 1.5px solid #0284c7;
-    }
-    .memo-items-table td {
-        border: 1.5px solid #0284c7;
-        padding: 8px 8px;
-        font-size: 10pt;
-    }
-    .item-row:nth-child(even) {
-        background: rgba(248, 250, 252, 0.5);
-    }
-
-    /* Watermark */
     .watermark-overlay {
         position: absolute;
         top: 50%;
@@ -781,33 +752,97 @@
         text-align: center;
         z-index: 1;
         pointer-events: none;
-        opacity: 0.12;
+        user-select: none;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .watermark-overlay img,
+    .watermark-img {
+        max-width: 220px;
+        max-height: 220px;
+        object-fit: contain;
+        opacity: 0.10;
+        display: block;
+        margin: 0 auto;
+    }
+    .watermark-svg {
+        max-width: 220px;
+        max-height: 220px;
+        display: block;
+        margin: 0 auto;
     }
     .watermark-text {
-        font-size: 16pt;
+        font-size: 15pt;
         font-weight: 900;
         color: #0284c7;
-        margin-top: 6px;
+        margin-top: 8px;
         letter-spacing: 0.5px;
+        opacity: 0.12;
+    }
+    .memo-items-table {
+        border-collapse: collapse;
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        background: transparent !important;
+    }
+    .memo-items-table tr,
+    .memo-items-table td {
+        background: transparent !important;
+    }
+    .memo-items-table th {
+        background-color: #1e3a8a;
+        color: #ffffff;
+        font-weight: bold;
+        font-size: 10pt;
+        padding: 7px 6px;
+        border: 1.5px solid #0284c7;
+        text-align: center;
+    }
+    .memo-items-table td {
+        border: 1.5px solid #0284c7;
+        padding: 6px 8px;
+        font-size: 10pt;
+    }
+    .col-brand { width: 30%; }
+    .col-box { width: 10%; }
+    .col-poly { width: 10%; }
+    .col-meer { width: 11%; }
+    .col-qty { width: 13%; }
+    .col-rate { width: 11%; }
+    .col-total { width: 15%; }
+
+    .empty-item-row td {
+        height: 28px;
+        border: 1.5px solid #0284c7;
     }
 
     /* In-Words Box */
     .in-words-box {
         border: 2px solid #0284c7;
-        padding: 5px;
-        border-radius: 4px;
+        padding: 0;
+        border-radius: 2px;
+        display: flex;
+        align-items: stretch;
     }
     .in-words-label {
         background-color: #0284c7;
         color: #ffffff;
         font-weight: bold;
-        padding: 5px 12px;
+        padding: 6px 12px;
         font-size: 10pt;
-        border-radius: 2px;
         white-space: nowrap;
+        display: flex;
+        align-items: center;
     }
     .in-words-value {
-        font-size: 10.5pt;
+        font-size: 10pt;
+        padding: 6px 10px;
+        display: flex;
+        align-items: center;
     }
 
     /* Summary Table (Bottom Right) */
@@ -828,7 +863,7 @@
         text-align: center;
     }
     .summary-label.bg-danger-cell {
-        background-color: #b91c1c;
+        background-color: #1e3a8a;
     }
     .summary-val {
         background-color: #ffffff;
@@ -853,12 +888,17 @@
     }
 
     /* ======================================================= */
-    /* FULL A4 PRINT SPECIFIC STYLES                          */
+    /* GUARANTEED SINGLE-PAGE FULL A4 PRINT STYLES             */
     /* ======================================================= */
     @media print {
         @page {
             size: A4 portrait;
-            margin: 10mm 10mm 10mm 10mm;
+            margin: 4mm 6mm 4mm 6mm;
+        }
+        *, *::before, *::after {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            box-sizing: border-box !important;
         }
         html, body {
             background: #ffffff !important;
@@ -867,38 +907,109 @@
             padding: 0 !important;
             width: 100% !important;
             height: 100% !important;
+            max-height: 297mm !important;
+            overflow: hidden !important;
         }
-        .app-sidebar, .app-header, header, nav, .d-print-none, #addPaymentModal, #sendSaleSmsModal, footer {
+        .app-sidebar, 
+        .app-header, 
+        header, 
+        nav, 
+        .d-print-none, 
+        #addPaymentModal, 
+        #sendSaleSmsModal, 
+        .modal, 
+        .toast-container, 
+        footer {
             display: none !important;
         }
-        .main-content, .page, .w-100 {
+        .main-content, 
+        .app-content, 
+        .page, 
+        .w-100 {
             margin: 0 !important;
             padding: 0 !important;
             width: 100% !important;
             max-width: 100% !important;
+            height: 100% !important;
+            max-height: 288mm !important;
+            overflow: hidden !important;
         }
         .official-memo-wrapper {
             box-shadow: none !important;
             border: none !important;
             width: 100% !important;
             max-width: 100% !important;
+            height: 100% !important;
+            max-height: 288mm !important;
             padding: 0 !important;
-            margin: 0 !important;
-            min-height: 265mm !important;
+            margin: 0 auto !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            page-break-before: avoid !important;
+            break-before: avoid !important;
+            page-break-after: avoid !important;
+            break-after: avoid !important;
         }
         .official-memo-border {
             border: 2px solid #0284c7 !important;
-            padding: 16px 18px !important;
-            min-height: 265mm !important;
+            outline: 1px solid #38bdf8 !important;
+            outline-offset: -3px !important;
+            padding: 10px 14px !important;
+            height: 100% !important;
+            max-height: 287mm !important;
             box-sizing: border-box !important;
             display: flex !important;
             flex-direction: column !important;
             justify-content: space-between !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            page-break-after: avoid !important;
+            break-after: avoid !important;
         }
-        /* Ensure exact print colors */
-        * {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
+        .memo-company-title {
+            font-size: 24pt !important;
+        }
+        .items-table-container {
+            min-height: auto !important;
+            margin-bottom: 8px !important;
+        }
+        .memo-items-table th {
+            padding: 4px 4px !important;
+            font-size: 9.5pt !important;
+        }
+        .memo-items-table td {
+            padding: 4px 6px !important;
+            font-size: 9.5pt !important;
+        }
+        .empty-item-row td {
+            height: 20px !important;
+            padding: 2px 4px !important;
+        }
+        .customer-table td {
+            padding: 4px 8px !important;
+            font-size: 9.5pt !important;
+        }
+        .purple-address-banner {
+            padding: 4px 12px !important;
+            font-size: 8.5pt !important;
+            margin-bottom: 8px !important;
+        }
+        .summary-table td {
+            padding: 3px 8px !important;
+            font-size: 9.5pt !important;
+        }
+        .in-words-label, .in-words-value {
+            padding: 4px 8px !important;
+            font-size: 9pt !important;
+        }
+        .slogan-pill-banner {
+            padding: 3px 20px !important;
+            font-size: 9pt !important;
+            margin-bottom: 4px !important;
+        }
+        .signature-row {
+            padding-top: 10px !important;
+            padding-bottom: 2px !important;
         }
     }
 </style>

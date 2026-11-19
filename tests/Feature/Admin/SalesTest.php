@@ -176,9 +176,10 @@ class SalesTest extends TestCase
         $response->assertStatus(200);
         $response->assertViewIs('admin.pages.sales.show');
         $response->assertSee('SALE-00002');
-        // If there is no due, পাওনা: and পূর্ব জের: must NOT appear
-        $response->assertDontSee('পাওনা:');
-        $response->assertDontSee('পূর্ব জের:');
+        // All 5 rows (মোট, পূর্ব জের, সর্বমোট, জমা, পাওনা) must appear matching the physical pad
+        $response->assertSee('পাওনা:');
+        $response->assertSee('পূর্ব জের:');
+        $response->assertSee('3,000.00');
     }
 
     public function test_memo_displays_due_amount_when_due_exists(): void
