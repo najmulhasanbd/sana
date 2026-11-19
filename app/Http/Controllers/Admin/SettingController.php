@@ -88,6 +88,10 @@ class SettingController extends Controller
             Setting::set('site_favicon', $path);
         }
 
+        // Handle boolean switches like SMS enabled & Test mode
+        $data['sms_enabled'] = $request->boolean('sms_enabled') ? '1' : '0';
+        $data['sms_test_mode'] = $request->boolean('sms_test_mode') ? '1' : '0';
+
         // Save all text settings
         foreach ($data as $key => $value) {
             Setting::set($key, $value);

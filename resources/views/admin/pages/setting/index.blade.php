@@ -78,7 +78,16 @@
                             <button class="nav-link rounded-pill px-3 py-2 fw-semibold d-flex align-items-center gap-2" 
                                     id="memo-tab" data-bs-toggle="pill" data-bs-target="#memo-pane" type="button" role="tab">
                                 <i class="fa-solid fa-receipt"></i>
-                                <span>মেমো ও চালান সেটিংস</span>
+                                <span>মেমো ও চালান</span>
+                            </button>
+                        </li>
+
+                        <!-- Tab 5: SMS Gateway & Dynamic Templates -->
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link rounded-pill px-3 py-2 fw-semibold d-flex align-items-center gap-2" 
+                                    id="sms-tab" data-bs-toggle="pill" data-bs-target="#sms-pane" type="button" role="tab">
+                                <i class="fa-solid fa-comment-sms"></i>
+                                <span>এসএমএস ও টেমপ্লেট</span>
                             </button>
                         </li>
                     </ul>
@@ -392,6 +401,204 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- TAB 5: SMS Gateway & Dynamic Templates -->
+                        <div class="tab-pane fade" id="sms-pane" role="tabpanel">
+                            <div class="row g-4">
+                                <!-- Section 1: Gateway Configuration -->
+                                <div class="col-12 border-bottom pb-2 mb-1 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                                    <div>
+                                        <h6 class="fw-bold text-dark m-0 d-flex align-items-center gap-2">
+                                            <i class="fa-solid fa-server text-primary"></i>
+                                            <span>এসএমএস গেটওয়ে সংযোগ ও সক্রিয়করণ</span>
+                                        </h6>
+                                        <small class="text-muted">বাংলাদেশি বাল্ক এসএমএস গেটওয়ে সেটিংস ও লাইভ/টেস্ট মোড কনফিগার করুন</small>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1.5 fw-semibold d-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#testSmsModal" style="font-size: 0.8rem;">
+                                        <i class="fa-solid fa-paper-plane"></i>
+                                        <span>টেস্ট মেসেজ পাঠান</span>
+                                    </button>
+                                </div>
+
+                                <!-- Switches: Enable & Test Mode -->
+                                <div class="col-md-6">
+                                    <div class="card border rounded-3 p-3 bg-light h-100">
+                                        <div class="form-check form-switch mb-2">
+                                            <input class="form-check-input" type="checkbox" role="switch" id="sms_enabled" name="sms_enabled" value="1"
+                                                   {{ !empty($settings['sms_enabled']) && $settings['sms_enabled'] == '1' ? 'checked' : '' }}>
+                                            <label class="form-check-label fw-bold text-dark" for="sms_enabled">
+                                                এসএমএস সার্ভিস চালু রাখুন (SMS Service Enabled)
+                                            </label>
+                                        </div>
+                                        <small class="text-muted" style="font-size: 0.8rem;">
+                                            চালু থাকলে মেমো তৈরি বা বকেয়া তাগাদার সময় কাস্টমারদের মোবাইলে মেসেজ পাঠানোর সুবিধা কার্যকর থাকবে।
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="card border rounded-3 p-3 bg-light h-100">
+                                        <div class="form-check form-switch mb-2">
+                                            <input class="form-check-input" type="checkbox" role="switch" id="sms_test_mode" name="sms_test_mode" value="1"
+                                                   {{ !isset($settings['sms_test_mode']) || $settings['sms_test_mode'] == '1' ? 'checked' : '' }}>
+                                            <label class="form-check-label fw-bold text-primary" for="sms_test_mode">
+                                                সিমুলেশন / টেস্ট মোড (Sandbox / Test Mode)
+                                            </label>
+                                        </div>
+                                        <small class="text-muted" style="font-size: 0.8rem;">
+                                            টেস্ট মোড চালু থাকলে কোনো আসল এসএমএস ব্যালেন্স কাটবে না; সিস্টেমের মেসেজ লগ ও মেমোর হিসাব যাচাই করা যাবে।
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <!-- Gateway Selection -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold text-secondary" for="sms_gateway">
+                                        এসএমএস গেটওয়ে প্রোভাইডার
+                                    </label>
+                                    @php
+                                        $selectedGateway = $settings['sms_gateway'] ?? 'sandbox';
+                                    @endphp
+                                    <select class="form-select" id="sms_gateway" name="sms_gateway">
+                                        <option value="sandbox" {{ $selectedGateway === 'sandbox' ? 'selected' : '' }}>টেস্ট মোড / সিমুলেশন (API ছাড়া পরীক্ষা)</option>
+                                        <option value="greenweb" {{ $selectedGateway === 'greenweb' ? 'selected' : '' }}>Greenweb BD (গ্রিনওয়েব)</option>
+                                        <option value="mimsms" {{ $selectedGateway === 'mimsms' ? 'selected' : '' }}>MimSMS (মিমএসএমএস)</option>
+                                        <option value="elitbuzz" {{ $selectedGateway === 'elitbuzz' ? 'selected' : '' }}>ElitBuzz (এলিটবাজ)</option>
+                                        <option value="generic" {{ $selectedGateway === 'generic' ? 'selected' : '' }}>অন্যান্য কাস্টম গেটওয়ে (Custom HTTP API)</option>
+                                    </select>
+                                </div>
+
+                                <!-- Sender ID / Masking -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold text-secondary" for="sms_sender_id">
+                                        সেন্ডার আইডি / মাস্কিং নাম (Sender ID)
+                                    </label>
+                                    <input type="text" class="form-control" id="sms_sender_id" name="sms_sender_id" 
+                                           value="{{ $settings['sms_sender_id'] ?? '' }}" 
+                                           placeholder="যেমন: SanaFish বা অনুমোদিত নন-মাস্কিং নম্বর">
+                                </div>
+
+                                <!-- API Key / Token -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold text-secondary" for="sms_api_key">
+                                        API কী বা টোকেন (API Key / Token)
+                                    </label>
+                                    <input type="password" class="form-control" id="sms_api_key" name="sms_api_key" 
+                                           value="{{ $settings['sms_api_key'] ?? '' }}" 
+                                           placeholder="প্রোভাইডার থেকে প্রাপ্ত API Key">
+                                </div>
+
+                                <!-- Custom API URL -->
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold text-secondary" for="sms_api_url">
+                                        কাস্টম API URL (ঐচ্ছিক / ডিফল্ট স্বয়ংক্রিয়ভাবে ব্যবহৃত হয়)
+                                    </label>
+                                    <input type="url" class="form-control" id="sms_api_url" name="sms_api_url" 
+                                           value="{{ $settings['sms_api_url'] ?? '' }}" 
+                                           placeholder="http://api.greenweb.com.bd/api.php বা কাস্টম গেটওয়ে লিঙ্ক">
+                                </div>
+
+                                <!-- Section 2: Dynamic Templates -->
+                                <div class="col-12 border-bottom pb-2 mt-4 mb-1">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <h6 class="fw-bold text-dark m-0 d-flex align-items-center gap-2">
+                                                <i class="fa-solid fa-file-pen text-primary"></i>
+                                                <span>এসএমএস টেমপ্লেট খাতা (ডাইনামিক মেমো ও হিসাব)</span>
+                                            </h6>
+                                            <small class="text-muted">মেসেজের ফরম্যাট একবারই লেখা থাকবে; মেমোর হিসাব স্বয়ংক্রিয়ভাবে ট্যাগ অনুযায়ী বসে যাবে</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Template 1: Sale Memo -->
+                                <div class="col-12 col-lg-6">
+                                    <div class="card border rounded-3 p-3 bg-white h-100 shadow-none">
+                                        <label class="form-label fw-bold text-dark d-flex align-items-center justify-content-between mb-1" for="sms_template_sale">
+                                            <span>১. বিক্রয় মেমো এসএমএস টেমপ্লেট</span>
+                                            <span class="badge bg-primary-subtle text-primary rounded-pill">চালান কনফার্মেশন</span>
+                                        </label>
+                                        <textarea class="form-control template-textarea mb-2" id="sms_template_sale" name="sms_template_sale" rows="4" style="font-size: 0.88rem;">{{ $settings['sms_template_sale'] ?? 'প্রিয় {customer_name}, সানা ফিশারিজ থেকে আপনার মেমো #{invoice_no} তৈরি হয়েছে। মোট বিল: ৳{total_amount}, জমা: ৳{paid_amount}, বকেয়া: ৳{due_amount}। ধন্যবাদ!' }}</textarea>
+                                        
+                                        <div class="tag-helper small">
+                                            <span class="text-muted d-block mb-1" style="font-size: 0.75rem;">ক্লিক করে ট্যাগ যুক্ত করুন:</span>
+                                            <div class="d-flex flex-wrap gap-1">
+                                                <span class="badge bg-light text-primary border cursor-pointer tag-badge" data-target="sms_template_sale">{customer_name}</span>
+                                                <span class="badge bg-light text-primary border cursor-pointer tag-badge" data-target="sms_template_sale">{invoice_no}</span>
+                                                <span class="badge bg-light text-primary border cursor-pointer tag-badge" data-target="sms_template_sale">{total_amount}</span>
+                                                <span class="badge bg-light text-primary border cursor-pointer tag-badge" data-target="sms_template_sale">{paid_amount}</span>
+                                                <span class="badge bg-light text-primary border cursor-pointer tag-badge" data-target="sms_template_sale">{due_amount}</span>
+                                                <span class="badge bg-light text-primary border cursor-pointer tag-badge" data-target="sms_template_sale">{sale_date}</span>
+                                                <span class="badge bg-light text-primary border cursor-pointer tag-badge" data-target="sms_template_sale">{company_phone}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Template 2: Due Reminder -->
+                                <div class="col-12 col-lg-6">
+                                    <div class="card border rounded-3 p-3 bg-white h-100 shadow-none">
+                                        <label class="form-label fw-bold text-dark d-flex align-items-center justify-content-between mb-1" for="sms_template_due">
+                                            <span>২. বকেয়া তাগাদা এসএমএস টেমপ্লেট</span>
+                                            <span class="badge bg-danger-subtle text-danger rounded-pill">বকেয়া রিমাইন্ডার</span>
+                                        </label>
+                                        <textarea class="form-control template-textarea mb-2" id="sms_template_due" name="sms_template_due" rows="4" style="font-size: 0.88rem;">{{ $settings['sms_template_due'] ?? 'জনাব {customer_name}, সানা ফিশারিজে আপনার পূর্বের মোট বকেয়া রয়েছে ৳{due_amount}। দ্রুত পরিশোধের জন্য অনুরোধ করা হলো। ফোন: {company_phone}' }}</textarea>
+                                        
+                                        <div class="tag-helper small">
+                                            <span class="text-muted d-block mb-1" style="font-size: 0.75rem;">ক্লিক করে ট্যাগ যুক্ত করুন:</span>
+                                            <div class="d-flex flex-wrap gap-1">
+                                                <span class="badge bg-light text-danger border cursor-pointer tag-badge" data-target="sms_template_due">{customer_name}</span>
+                                                <span class="badge bg-light text-danger border cursor-pointer tag-badge" data-target="sms_template_due">{due_amount}</span>
+                                                <span class="badge bg-light text-danger border cursor-pointer tag-badge" data-target="sms_template_due">{company_name}</span>
+                                                <span class="badge bg-light text-danger border cursor-pointer tag-badge" data-target="sms_template_due">{company_phone}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Template 3: Payment Receipt -->
+                                <div class="col-12 col-lg-6">
+                                    <div class="card border rounded-3 p-3 bg-white h-100 shadow-none">
+                                        <label class="form-label fw-bold text-dark d-flex align-items-center justify-content-between mb-1" for="sms_template_payment">
+                                            <span>৩. টাকা আদায় / পেমেন্ট রসিদ টেমপ্লেট</span>
+                                            <span class="badge bg-success-subtle text-success rounded-pill">টাকা জমা</span>
+                                        </label>
+                                        <textarea class="form-control template-textarea mb-2" id="sms_template_payment" name="sms_template_payment" rows="4" style="font-size: 0.88rem;">{{ $settings['sms_template_payment'] ?? 'প্রিয় {customer_name}, আপনার ৳{paid_amount} সফলভাবে জমা হয়েছে। বর্তমান অবশিষ্ট বকেয়া: ৳{due_amount}। সানা ফিশারিজ।' }}</textarea>
+                                        
+                                        <div class="tag-helper small">
+                                            <span class="text-muted d-block mb-1" style="font-size: 0.75rem;">ক্লিক করে ট্যাগ যুক্ত করুন:</span>
+                                            <div class="d-flex flex-wrap gap-1">
+                                                <span class="badge bg-light text-success border cursor-pointer tag-badge" data-target="sms_template_payment">{customer_name}</span>
+                                                <span class="badge bg-light text-success border cursor-pointer tag-badge" data-target="sms_template_payment">{paid_amount}</span>
+                                                <span class="badge bg-light text-success border cursor-pointer tag-badge" data-target="sms_template_payment">{due_amount}</span>
+                                                <span class="badge bg-light text-success border cursor-pointer tag-badge" data-target="sms_template_payment">{company_phone}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Template 4: Broadcast Notice -->
+                                <div class="col-12 col-lg-6">
+                                    <div class="card border rounded-3 p-3 bg-white h-100 shadow-none">
+                                        <label class="form-label fw-bold text-dark d-flex align-items-center justify-content-between mb-1" for="sms_template_broadcast">
+                                            <span>৪. সাধারণ নোটিশ / ঘোষণা / শুভেচ্ছা টেমপ্লেট</span>
+                                            <span class="badge bg-info-subtle text-info rounded-pill">প্রচার ও অফার</span>
+                                        </label>
+                                        <textarea class="form-control template-textarea mb-2" id="sms_template_broadcast" name="sms_template_broadcast" rows="4" style="font-size: 0.88rem;">{{ $settings['sms_template_broadcast'] ?? 'সম্মানিত কাস্টমার, সানা ফিশারিজে উন্নত জাতের মাছের পোনার নতুন চালান এসেছে। যোগাযোগ: {company_phone}' }}</textarea>
+                                        
+                                        <div class="tag-helper small">
+                                            <span class="text-muted d-block mb-1" style="font-size: 0.75rem;">ক্লিক করে ট্যাগ যুক্ত করুন:</span>
+                                            <div class="d-flex flex-wrap gap-1">
+                                                <span class="badge bg-light text-info border cursor-pointer tag-badge" data-target="sms_template_broadcast">{customer_name}</span>
+                                                <span class="badge bg-light text-info border cursor-pointer tag-badge" data-target="sms_template_broadcast">{company_name}</span>
+                                                <span class="badge bg-light text-info border cursor-pointer tag-badge" data-target="sms_template_broadcast">{company_phone}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -415,6 +622,70 @@
 
             </form>
         </div>
+
+<!-- ================= TEST SMS MODAL ================= -->
+<div class="modal fade" id="testSmsModal" tabindex="-1" aria-labelledby="testSmsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-light border-bottom py-3 px-4">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-3 d-flex align-items-center justify-content-center text-white flex-shrink-0" 
+                         style="width: 36px; height: 36px; background: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </div>
+                    <div>
+                        <h6 class="modal-title fw-bold text-dark mb-0">গেটওয়ে টেস্ট এসএমএস পাঠান</h6>
+                        <small class="text-muted" style="font-size: 0.75rem;">কনফিগারেশন সঠিক আছে কি না তা যাচাই করুন</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form action="{{ route('admin.sms.test-gateway') }}" method="POST">
+                @csrf
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label for="testMobileInput" class="form-label fw-semibold text-secondary" style="font-size: 0.85rem;">
+                            টেস্ট মোবাইল নম্বর <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted border-end-0">+88</span>
+                            <input type="text" 
+                                   id="testMobileInput" 
+                                   name="test_mobile" 
+                                   class="form-control" 
+                                   placeholder="017xxxxxxxx" 
+                                   value="{{ $settings['mobile'] ?? '' }}"
+                                   required 
+                                   style="font-size: 0.88rem;">
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="testMessageInput" class="form-label fw-semibold text-secondary" style="font-size: 0.85rem;">
+                            টেস্ট মেসেজ <span class="text-danger">*</span>
+                        </label>
+                        <textarea id="testMessageInput" 
+                                  name="test_message" 
+                                  rows="3" 
+                                  class="form-control" 
+                                  required 
+                                  style="font-size: 0.88rem;">সানা ফিশারিজ: এটি একটি টেস্ট এসএমএস। গেটওয়ে সংযোগ সফলভাবে সম্পন্ন হয়েছে।</textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light border-top py-2.5 px-4 d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-light border px-3 py-2 rounded-3 text-secondary" data-bs-dismiss="modal" style="font-size: 0.85rem;">
+                        বাতিল
+                    </button>
+                    <button type="submit" class="btn btn-primary px-4 py-2 rounded-3 fw-semibold shadow-sm btn-submit-with-spinner" data-loading-text="মেসেজ পাঠানো হচ্ছে..." style="font-size: 0.85rem;">
+                        <i class="fa-solid fa-paper-plane me-1"></i>টেস্ট মেসেজ পাঠান
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <style>
     .custom-settings-tabs .nav-link {
@@ -471,12 +742,19 @@
             }
         }
 
-        const tabButtons = document.querySelectorAll('#settingsTab button[data-bs-toggle="pill"]');
-        tabButtons.forEach(button => {
-            button.addEventListener('shown.bs.tab', function (e) {
-                const target = e.target.getAttribute('data-bs-target');
-                if (target) {
-                    history.replaceState(null, null, target);
+        // Click tag to insert into template textarea
+        document.querySelectorAll('.tag-badge').forEach(badge => {
+            badge.addEventListener('click', function () {
+                const targetId = this.getAttribute('data-target');
+                const tag = this.innerText.trim();
+                const textarea = document.getElementById(targetId);
+                if (textarea) {
+                    const start = textarea.selectionStart;
+                    const end = textarea.selectionEnd;
+                    const text = textarea.value;
+                    textarea.value = text.substring(0, start) + tag + text.substring(end);
+                    textarea.focus();
+                    textarea.selectionStart = textarea.selectionEnd = start + tag.length;
                 }
             });
         });

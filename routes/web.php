@@ -9,13 +9,17 @@ use App\Http\Controllers\Admin\DivisionController;
 use App\Http\Controllers\Admin\EmployeeAdvanceController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\EmployeeSalaryController;
+use App\Http\Controllers\Admin\ExpenseCategoryController;
+use App\Http\Controllers\Admin\ExpenseController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\PasswordController;
+use App\Http\Controllers\Admin\ProfitLossReportController;
 use App\Http\Controllers\Admin\PurchaseController;
 use App\Http\Controllers\Admin\PurchaseProductController;
 use App\Http\Controllers\Admin\SaleProductController;
 use App\Http\Controllers\Admin\SalesController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\SmsController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\ZoneController;
 use App\Http\Controllers\ProfileController;
@@ -57,7 +61,15 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
 
     // Sales (মাছ ও পণ্য বিক্রয় ও চালান)
     Route::post('sales/{sale}/payments', [SalesController::class, 'addPayment'])->name('admin.sales.payment.store');
+    Route::post('sales/{sale}/send-sms', [SmsController::class, 'sendSaleMemo'])->name('admin.sales.send-sms');
     Route::resource('sales', SalesController::class)->only(['index', 'create', 'store', 'show', 'destroy'])->names('admin.sales');
+
+    // SMS Center & Bulk Messaging (একক, যৌথ ও সম্প্রচার এসএমএস)
+    Route::get('sms', [SmsController::class, 'index'])->name('admin.sms.index');
+    Route::post('sms/send-single', [SmsController::class, 'sendSingle'])->name('admin.sms.send-single');
+    Route::post('sms/send-group-due', [SmsController::class, 'sendGroupDue'])->name('admin.sms.send-group-due');
+    Route::post('sms/send-broadcast', [SmsController::class, 'sendBroadcast'])->name('admin.sms.send-broadcast');
+    Route::post('sms/test-gateway', [SmsController::class, 'testGateway'])->name('admin.sms.test-gateway');
 
     // Customer Due Sheet & Area-wise Collection Report (বকেয়া শিট ও এলাকাভিত্তিক হিসাব)
     Route::get('reports/customer-due-sheet', [CustomerDueController::class, 'index'])->name('admin.customer-due.index');
@@ -72,6 +84,16 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
     // Staff / Employee Management (কর্মচারী ও বেতন-অগ্রিম হিসাব)
     Route::patch('employees/{employee}/toggle-status', [EmployeeController::class, 'toggleStatus'])->name('admin.employee.toggle-status');
     Route::resource('employees', EmployeeController::class)->names('admin.employee');
+
+    // Expense Categories (খরচের খাতসমূহ - Modal CRUD)
+    Route::patch('expense-categories/{expenseCategory}/toggle-status', [ExpenseCategoryController::class, 'toggleStatus'])->name('admin.expense-category.toggle-status');
+    Route::resource('expense-categories', ExpenseCategoryController::class)->names('admin.expense-category');
+
+    // Expenses (দৈনিক প্রাতিষ্ঠানিক অন্যান্য খরচ খাতা)
+    Route::resource('expenses', ExpenseController::class)->names('admin.expense');
+
+    // Profit & Loss and Income vs Expense Report (আয়-ব্যয় ও লাভ-ক্ষতির হিসাব)
+    Route::get('reports/profit-loss', [ProfitLossReportController::class, 'index'])->name('admin.report.profit-loss');
 
     // Employee Advance (কর্মচারী অগ্রিম খাতা)
     Route::post('employee-advances', [EmployeeAdvanceController::class, 'store'])->name('admin.employee-advance.store');

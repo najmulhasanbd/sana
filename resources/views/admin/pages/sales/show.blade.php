@@ -38,6 +38,16 @@
                     <span>বকেয়া আদায় / জমা</span>
                 </button>
             @endif
+            @if(!empty($sale->customer?->mobile))
+                <button type="button" 
+                        class="btn btn-outline-info rounded-pill px-3 py-2 fw-semibold shadow-sm d-flex align-items-center gap-2" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#sendSaleSmsModal"
+                        style="font-size: 0.85rem;">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>মেমো SMS পাঠান</span>
+                </button>
+            @endif
             <button type="button" onclick="window.print()" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold shadow-sm d-flex align-items-center gap-2" style="font-size: 0.85rem;">
                 <i class="fa-solid fa-print"></i>
                 <span>প্রিন্ট মেমো (A4)</span>
@@ -537,6 +547,82 @@
     </div>
 </div>
 
+@if(!empty($sale->customer?->mobile))
+@php
+    $smsService = app(\App\Services\SmsService::class);
+    $saleTemplate = \App\Models\Setting::get('sms_template_sale', 'প্রিয় {customer_name}, সানা ফিশারিজ থেকে আপনার মেমো #{invoice_no} তৈরি হয়েছে। মোট বিল: ৳{total_amount}, জমা: ৳{paid_amount}, বকেয়া: ৳{due_amount}। ধন্যবাদ!');
+    $renderedSaleSms = $smsService->renderSaleTemplate($saleTemplate, $sale);
+@endphp
+<!-- ================= SEND SALE MEMO SMS MODAL ================= -->
+<div class="modal fade" id="sendSaleSmsModal" tabindex="-1" aria-labelledby="sendSaleSmsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-light border-bottom py-3 px-4">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-3 d-flex align-items-center justify-content-center text-white flex-shrink-0" 
+                         style="width: 36px; height: 36px; background: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </div>
+                    <div>
+                        <h6 class="modal-title fw-bold text-dark mb-0">মেমোর হিসাব এসএমএস পাঠান</h6>
+                        <small class="text-muted" style="font-size: 0.75rem;">কাস্টমারের মোবাইলে মেমোর হিসাব পাঠানো</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form action="{{ route('admin.sales.send-sms', $sale->id) }}" method="POST">
+                @csrf
+                <div class="modal-body p-4">
+                    <div class="card border rounded-3 p-3 bg-light mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted small">কাস্টমার:</span>
+                            <strong class="text-dark">{{ $sale->customer->name }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted small">মোবাইল নম্বর:</span>
+                            <strong class="text-primary">{{ $sale->customer->mobile }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted small">মোট বিল:</span>
+                            <span class="fw-bold text-dark">৳ {{ number_format($sale->total_amount, 2) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted small">অবশিষ্ট বকেয়া:</span>
+                            <span class="fw-bold text-danger">৳ {{ number_format($sale->due_amount, 2) }}</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="saleSmsMessage" class="form-label fw-semibold text-secondary" style="font-size: 0.85rem;">
+                            এসএমএস মেসেজ (স্বয়ংক্রিয় হিসাবকৃত)
+                        </label>
+                        <textarea id="saleSmsMessage" 
+                                  name="message" 
+                                  rows="4" 
+                                  class="form-control" 
+                                  required 
+                                  style="font-size: 0.88rem;">{{ $renderedSaleSms }}</textarea>
+                        <small class="text-muted" style="font-size: 0.75rem;">
+                            প্রয়োজনে পাঠানোর আগে মেসেজের লেখা সম্পাদন করতে পারেন।
+                        </small>
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light border-top py-2.5 px-4 d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-light border px-3 py-2 rounded-3 text-secondary" data-bs-dismiss="modal" style="font-size: 0.85rem;">
+                        বাতিল
+                    </button>
+                    <button type="submit" class="btn btn-primary px-4 py-2 rounded-3 fw-semibold shadow-sm btn-submit-with-spinner" data-loading-text="এসএমএস পাঠানো হচ্ছে..." style="font-size: 0.85rem;">
+                        <i class="fa-solid fa-paper-plane me-1"></i>এসএমএস পাঠান
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
+
 <!-- ================= STYLES FOR FULL A4 MEMO & PRINT ================= -->
 <style>
     /* Memo Container Dimensions */
@@ -782,7 +868,7 @@
             width: 100% !important;
             height: 100% !important;
         }
-        .app-sidebar, .app-header, header, nav, .d-print-none, #addPaymentModal, footer {
+        .app-sidebar, .app-header, header, nav, .d-print-none, #addPaymentModal, #sendSaleSmsModal, footer {
             display: none !important;
         }
         .main-content, .page, .w-100 {

@@ -19,7 +19,15 @@
                 </ol>
             </nav>
         </div>
-        <div class="d-flex gap-2">
+        <div class="d-flex flex-wrap gap-2">
+            <button type="button" 
+                    class="btn btn-outline-danger rounded-pill px-3 py-2 fw-semibold shadow-sm d-flex align-items-center gap-2" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#sendDueReminderSmsModal"
+                    style="font-size: 0.85rem;">
+                <i class="fa-solid fa-comment-dollar"></i>
+                <span>বকেয়া তাগাদা SMS পাঠান</span>
+            </button>
             <a href="{{ route('admin.customer.index') }}" class="btn btn-outline-secondary rounded-pill px-3 py-2 fw-semibold shadow-sm d-flex align-items-center gap-2" style="font-size: 0.85rem;">
                 <i class="fa-solid fa-users"></i>
                 <span>সকল কাস্টমার</span>
@@ -534,6 +542,78 @@
     }
     table { page-break-inside: auto; }
     tr { page-break-inside: avoid; }
+}
+</style>
+<!-- ================= SEND DUE REMINDER SMS MODAL ================= -->
+<div class="modal fade d-print-none" id="sendDueReminderSmsModal" tabindex="-1" aria-labelledby="sendDueReminderSmsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-light border-bottom py-3 px-4">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-3 d-flex align-items-center justify-content-center text-white flex-shrink-0" 
+                         style="width: 36px; height: 36px; background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);">
+                        <i class="fa-solid fa-comment-dollar"></i>
+                    </div>
+                    <div>
+                        <h6 class="modal-title fw-bold text-dark mb-0">বকেয়া তাগাদা এসএমএস পাঠান</h6>
+                        <small class="text-muted" style="font-size: 0.75rem;">বকেয়া কাস্টমারদের মোবাইলে অটোমেটিক হিসাবসহ রিমাইন্ডার</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form action="{{ route('admin.sms.send-group-due') }}" method="POST">
+                @csrf
+                <!-- Pass current area filters if applied -->
+                <input type="hidden" name="division_id" value="{{ $divisionId ?? '' }}">
+                <input type="hidden" name="district_id" value="{{ $districtId ?? '' }}">
+
+                <div class="modal-body p-4">
+                    <div class="alert alert-warning border-0 rounded-3 p-3 mb-3 d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-circle-info fs-5 text-warning flex-shrink-0"></i>
+                        <div style="font-size: 0.83rem;">
+                            <strong>স্বয়ংক্রিয় হিসাব:</strong> প্রতিটি কাস্টমারের মোবাইলে তাদের নিজ নিজ নাম ও বকেয়া টাকার পরিমাণ (<code class="text-danger">{due_amount}</code>) অটোমেটিক বসে যাবে।
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-secondary small">
+                            বকেয়া তাগাদার মেসেজ টেমপ্লেট
+                        </label>
+                        <textarea name="message" 
+                                  rows="4" 
+                                  class="form-control" 
+                                  required 
+                                  style="font-size: 0.88rem;">{{ \App\Models\Setting::get('sms_template_due', 'জনাব {customer_name}, সানা ফিশারিজে আপনার পূর্বের মোট বকেয়া রয়েছে ৳{due_amount}। দ্রুত পরিশোধের জন্য অনুরোধ করা হলো। ফোন: {company_phone}') }}</textarea>
+                        <small class="text-muted" style="font-size: 0.72rem;">
+                            ট্যাগসমূহ: <code class="text-primary">{customer_name}</code>, <code class="text-danger">{due_amount}</code>, <code class="text-dark">{company_phone}</code>
+                        </small>
+                    </div>
+
+                    <div class="card border rounded-3 p-2.5 bg-light text-secondary small">
+                        <i class="fa-solid fa-users text-danger me-1"></i>
+                        বর্তমানে এই শিটের বকেয়া কাস্টমার সংখ্যা: <strong>{{ number_format($customers->count()) }} জন</strong>
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light border-top py-2.5 px-4 d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-light border px-3 py-2 rounded-3 text-secondary" data-bs-dismiss="modal" style="font-size: 0.85rem;">
+                        বাতিল
+                    </button>
+                    <button type="submit" class="btn btn-danger px-4 py-2 rounded-3 fw-semibold shadow-sm btn-submit-with-spinner" data-loading-text="তাগাদা এসএমএস যাচ্ছে...">
+                        <i class="fa-solid fa-paper-plane me-1"></i>এক ক্লিকে সবাইকে পাঠান
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+@media print {
+    #sendDueReminderSmsModal {
+        display: none !important;
+    }
 }
 </style>
 @endsection

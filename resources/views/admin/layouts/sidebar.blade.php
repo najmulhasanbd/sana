@@ -161,18 +161,31 @@
                 </ul>
             </li>
 
-            <!-- Accounts & Billing -->
-            <!-- <li class="nav-item has-dropdown">
+            <!-- Accounts & Finance (হিসাব, ব্যয় ও লাভ-ক্ষতি) -->
+            <li class="nav-item has-dropdown {{ request()->routeIs('admin.expense.*') || request()->routeIs('admin.expense-category.*') || request()->routeIs('admin.report.profit-loss') ? 'open' : '' }}">
                 <div class="dropdown-header">
                     <i class="fa-solid fa-file-invoice-dollar"></i>
                     <span>Accounts & Finance</span>
                     <i class="fa-solid fa-chevron-right arrow"></i>
                 </div>
                 <ul class="submenu">
-                    <li><a href="#"></i>Daily Cash Book</a></li>
-                    <li><a href="#"></i>Due & Collections</a></li>
+                    <li class="{{ request()->routeIs('admin.expense.index') ? 'active' : '' }}">
+                        <a href="{{ route('admin.expense.index') }}" class="{{ request()->routeIs('admin.expense.index') ? 'text-primary fw-bold' : '' }}">
+                            Daily Expenses
+                        </a>
+                    </li>
+                    <li class="{{ request()->routeIs('admin.expense-category.*') ? 'active' : '' }}">
+                        <a href="{{ route('admin.expense-category.index') }}" class="{{ request()->routeIs('admin.expense-category.*') ? 'text-primary fw-bold' : '' }}">
+                            Expense Categories
+                        </a>
+                    </li>
+                    <li class="{{ request()->routeIs('admin.report.profit-loss') ? 'active' : '' }}">
+                        <a href="{{ route('admin.report.profit-loss') }}" class="{{ request()->routeIs('admin.report.profit-loss') ? 'text-primary fw-bold' : '' }}">
+                            Profit & Loss Report
+                        </a>
+                    </li>
                 </ul>
-            </li> -->
+            </li>
 
             <li class="nav-item has-dropdown {{ request()->routeIs('admin.division.*') || request()->routeIs('admin.district.*') || request()->routeIs('admin.zone.*') ? 'open' : '' }}">
                 <div class="dropdown-header">
@@ -199,9 +212,30 @@
                 </ul>
             </li>
 
+            <!-- Section: Communication & Messaging -->
+            <li class="nav-section-title px-4 pt-3 pb-1 text-uppercase text-muted" style="font-size: 0.68rem; font-weight: 700; letter-spacing: 0.5px; opacity: 0.75;">
+                Communication
+            </li>
+
+            <!-- SMS Center -->
+            <li class="nav-item {{ request()->routeIs('admin.sms.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.sms.index') }}">
+                    <i class="fa-solid fa-comment-sms"></i>
+                    <span>SMS Center</span>
+                </a>
+            </li>
+
             <!-- Section: System -->
             <li class="nav-section-title px-4 pt-3 pb-1 text-uppercase text-muted" style="font-size: 0.68rem; font-weight: 700; letter-spacing: 0.5px; opacity: 0.75;">
                 System
+            </li>
+
+            <!-- System Settings -->
+            <li class="nav-item {{ request()->routeIs('setting.*') ? 'active' : '' }}">
+                <a href="{{ route('setting.index') }}">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span>Business Settings</span>
+                </a>
             </li>
         </ul>
     </div>
