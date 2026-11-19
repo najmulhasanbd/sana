@@ -11,7 +11,7 @@
     --bg-body: #f8fafc;
     --header-height: 4.25rem;
     --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    --family: 'Roboto', sans-serif;
+    --family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 * {
