@@ -28,6 +28,15 @@
                 <i class="fa-solid fa-file-invoice-dollar"></i>
                 <span>বকেয়া শিটে দেখুন</span>
             </a>
+            @if($stats['total_due'] > 0)
+                <button type="button" 
+                        class="btn btn-success rounded-pill px-3 py-2 fw-semibold shadow-sm d-flex align-items-center gap-2" 
+                        onclick="openCollectDueModal({{ $customer->id }}, '{{ addslashes($customer->name) }}', '{{ $customer->mobile }}', {{ $stats['total_due'] }})"
+                        style="font-size: 0.85rem;">
+                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                    <span>বকেয়া টাকা জমা / আদায়</span>
+                </button>
+            @endif
             <button type="button" onclick="window.print()" class="btn btn-primary rounded-pill px-3 py-2 fw-semibold shadow-sm d-flex align-items-center gap-2" style="font-size: 0.85rem;">
                 <i class="fa-solid fa-print"></i>
                 <span>লেজার প্রিন্ট করুন</span>
@@ -82,6 +91,14 @@
                 </div>
 
                 <div class="mt-4 pt-3 border-top">
+                    @if($stats['total_due'] > 0)
+                        <button type="button" 
+                                class="btn btn-success w-100 rounded-pill py-2 fw-semibold mb-2 shadow-sm" 
+                                onclick="openCollectDueModal({{ $customer->id }}, '{{ addslashes($customer->name) }}', '{{ $customer->mobile }}', {{ $stats['total_due'] }})"
+                                style="font-size: 0.85rem;">
+                            <i class="fa-solid fa-hand-holding-dollar me-1"></i>বকেয়া টাকা জমা / আদায়
+                        </button>
+                    @endif
                     <a href="{{ route('admin.sales.create') }}" class="btn btn-outline-primary w-100 rounded-pill py-2 fw-semibold" style="font-size: 0.85rem;">
                         <i class="fa-solid fa-cart-plus me-1"></i>এই কাস্টমারকে নতুন বিক্রয়
                     </a>
@@ -249,6 +266,90 @@
                                         <i class="fa-solid fa-plus me-1"></i>নতুন বিক্রয় চালান
                                     </a>
                                 </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Screen Payment Vouchers List (Screen only) -->
+    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden mb-4 d-print-none">
+        <div class="card-header bg-white border-bottom p-3 p-md-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-file-invoice-dollar text-success"></i>
+                    <span>বকেয়া জমার ভাউচার ও রসিদসমূহ (Payment Receipts)</span>
+                </h5>
+                <small class="text-muted">এই কাস্টমারের সরাসরি মোট বাকি জমার সকল অফিশিয়াল ভাউচার</small>
+            </div>
+            @if($stats['total_due'] > 0)
+                <button type="button" 
+                        class="btn btn-sm btn-success rounded-pill px-3 py-1.5 fw-semibold shadow-sm" 
+                        onclick="openCollectDueModal({{ $customer->id }}, '{{ addslashes($customer->name) }}', '{{ $customer->mobile }}', {{ $stats['total_due'] }})">
+                    <i class="fa-solid fa-plus me-1"></i>নতুন বকেয়া জমা
+                </button>
+            @endif
+        </div>
+
+        <div class="table-responsive">
+            <table class="table align-middle mb-0 table-hover">
+                <thead class="bg-light table-light">
+                    <tr>
+                        <th class="ps-4 text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem; width: 60px;">#</th>
+                        <th class="text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem;">ভাউচার নং ও তারিখ</th>
+                        <th class="text-end text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem;">পূর্বের বকেয়া</th>
+                        <th class="text-end text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem;">আদায়কৃত টাকা</th>
+                        <th class="text-end text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem;">অবশিষ্ট বকেয়া</th>
+                        <th class="text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem;">মাধ্যম</th>
+                        <th class="text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem;">মন্তব্য</th>
+                        <th class="pe-4 text-end text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem; width: 140px;">অ্যাকশন</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($payments as $p)
+                        <tr>
+                            <td class="ps-4 fw-semibold text-muted" style="font-size: 0.85rem;">{{ $loop->iteration }}</td>
+                            <td>
+                                <div>
+                                    <a href="{{ route('admin.customer-payments.show', $p) }}" class="fw-bold text-primary text-decoration-none">
+                                        {{ $p->voucher_no }}
+                                    </a>
+                                    <small class="text-muted d-block" style="font-size: 0.75rem;">
+                                        <i class="fa-regular fa-calendar me-1"></i>{{ $p->payment_date->format('d M, Y') }}
+                                    </small>
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold text-muted" style="font-size: 0.88rem;">
+                                ৳{{ number_format($p->previous_due, 2) }}
+                            </td>
+                            <td class="text-end fw-bold text-success fs-6">
+                                ৳{{ number_format($p->amount, 2) }}
+                            </td>
+                            <td class="text-end fw-bold {{ $p->remaining_due > 0 ? 'text-danger' : 'text-muted' }}" style="font-size: 0.88rem;">
+                                ৳{{ number_format($p->remaining_due, 2) }}
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border px-2 py-0.5" style="font-size: 0.72rem;">
+                                    {{ $p->payment_method }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="text-muted small">{{ $p->note ?: '—' }}</span>
+                            </td>
+                            <td class="pe-4 text-end">
+                                <a href="{{ route('admin.customer-payments.show', $p) }}" 
+                                   class="btn btn-sm btn-light border rounded-pill px-2.5 py-1 text-primary shadow-xs" 
+                                   title="ভাউচার স্লিপ দেখুন ও প্রিন্ট করুন">
+                                    <i class="fa-solid fa-print me-1"></i>ভাউচার
+                                </a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted small">
+                                এই কাস্টমারের কোনো সরাসরি বকেয়া জমার ভাউচার তৈরি হয়নি।
                             </td>
                         </tr>
                     @endforelse
@@ -426,4 +527,6 @@
         </div>
     </div>
 </div>
+
+@include('admin.pages.customer-payments.partials.collect-modal')
 @endsection

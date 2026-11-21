@@ -28,6 +28,13 @@
                 <i class="fa-solid fa-comment-dollar"></i>
                 <span>বকেয়া তাগাদা SMS পাঠান</span>
             </button>
+            <button type="button" 
+                    class="btn btn-outline-success rounded-pill px-3 py-2 fw-semibold shadow-sm d-flex align-items-center gap-2" 
+                    onclick="openCollectDueModal()" 
+                    style="font-size: 0.85rem;">
+                <i class="fa-solid fa-hand-holding-dollar"></i>
+                <span>বকেয়া টাকা জমা</span>
+            </button>
             <a href="{{ route('admin.customer.index') }}" class="btn btn-outline-secondary rounded-pill px-3 py-2 fw-semibold shadow-sm d-flex align-items-center gap-2" style="font-size: 0.85rem;">
                 <i class="fa-solid fa-users"></i>
                 <span>সকল কাস্টমার</span>
@@ -272,6 +279,15 @@
                                         <td class="text-end fw-semibold text-success">৳{{ number_format($cust->total_paid ?? 0, 2) }}</td>
                                         <td class="text-end fw-bold text-danger fs-6">৳{{ number_format($cust->total_due ?? 0, 2) }}</td>
                                         <td class="pe-4 text-end">
+                                            @if(($cust->total_due ?? 0) > 0)
+                                                <button type="button" 
+                                                        class="btn btn-sm btn-outline-success rounded-pill px-2.5 py-1 fw-semibold me-1" 
+                                                        style="font-size: 0.75rem;" 
+                                                        onclick="openCollectDueModal({{ $cust->id }}, '{{ addslashes($cust->name) }}', '{{ $cust->mobile }}', {{ (float)$cust->total_due }})" 
+                                                        title="বকেয়া টাকা জমা নিন">
+                                                    <i class="fa-solid fa-hand-holding-dollar me-1"></i>জমা
+                                                </button>
+                                            @endif
                                             <a href="{{ route('admin.customer.show', $cust) }}" class="btn btn-sm btn-light border rounded-pill px-2.5 py-1 text-primary fw-medium" style="font-size: 0.75rem;">
                                                 <i class="fa-solid fa-receipt me-1"></i>লেজার
                                             </a>
@@ -328,6 +344,15 @@
                                     <td class="text-end fw-semibold text-success">৳{{ number_format($cust->total_paid ?? 0, 2) }}</td>
                                     <td class="text-end fw-bold text-danger fs-6">৳{{ number_format($cust->total_due ?? 0, 2) }}</td>
                                     <td class="pe-4 text-end">
+                                        @if(($cust->total_due ?? 0) > 0)
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-outline-success rounded-pill px-2.5 py-1 fw-semibold me-1" 
+                                                    style="font-size: 0.75rem;" 
+                                                    onclick="openCollectDueModal({{ $cust->id }}, '{{ addslashes($cust->name) }}', '{{ $cust->mobile }}', {{ (float)$cust->total_due }})" 
+                                                    title="বকেয়া টাকা জমা নিন">
+                                                <i class="fa-solid fa-hand-holding-dollar me-1"></i>জমা
+                                            </button>
+                                        @endif
                                         <a href="{{ route('admin.customer.show', $cust) }}" class="btn btn-sm btn-light border rounded-pill px-2.5 py-1 text-primary fw-medium" style="font-size: 0.75rem;">
                                             <i class="fa-solid fa-receipt me-1"></i>লেজার
                                         </a>
@@ -412,13 +437,12 @@
                             <tr style="background:#f1f5f9; border-bottom:1px solid #cbd5e1;">
                                 <th style="padding:5px; text-align:left; width:28px; border-right:1px solid #cbd5e1;">#</th>
                                 <th style="padding:5px 8px; text-align:left; border-right:1px solid #cbd5e1;">কাস্টমারের নাম</th>
-                                <th style="padding:5px 8px; text-align:left; width:95px; border-right:1px solid #cbd5e1;">মোবাইল</th>
-                                <th style="padding:5px 8px; text-align:left; border-right:1px solid #cbd5e1;">ঠিকানা</th>
-                                <th style="padding:5px 8px; text-align:right; width:80px; border-right:1px solid #cbd5e1;">মোট ক্রয় (৳)</th>
-                                <th style="padding:5px 8px; text-align:right; width:75px; border-right:1px solid #cbd5e1;">পরিশোধ (৳)</th>
-                                <th style="padding:5px 8px; text-align:right; width:90px; border-right:1px solid #cbd5e1; background:#fee2e2; color:#dc2626;">বকেয়া (৳)</th>
-                                <th style="padding:5px 8px; text-align:center; width:90px; border-right:1px solid #cbd5e1;">আদায় নোট</th>
-                                <th style="padding:5px 8px; text-align:center; width:80px;">স্বাক্ষর</th>
+                                <th style="padding:5px 8px; text-align:left; border-right:1px solid #cbd5e1;">ঠিকানা (শুধু গ্রাম)</th>
+                                <th style="padding:5px 8px; text-align:right; width:85px; border-right:1px solid #cbd5e1;">মোট ক্রয় (৳)</th>
+                                <th style="padding:5px 8px; text-align:right; width:80px; border-right:1px solid #cbd5e1;">মোট জমা (৳)</th>
+                                <th style="padding:5px 8px; text-align:right; width:95px; border-right:1px solid #cbd5e1; background:#fee2e2; color:#dc2626;">বকেয়া (৳)</th>
+                                <th style="padding:5px 8px; text-align:center; width:100px; border-right:1px solid #cbd5e1;">ফোন নম্বর</th>
+                                <th style="padding:5px 8px; text-align:center; width:95px;">আদায় ও স্বাক্ষর</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -426,17 +450,16 @@
                                 <tr style="background:{{ $cIdx % 2 === 0 ? '#fff' : '#f8fafc' }}; border-bottom:1px solid #e2e8f0;">
                                     <td style="padding:4px 5px; border-right:1px solid #e2e8f0;">{{ $globalSerial++ }}</td>
                                     <td style="padding:4px 8px; font-weight:700; color:#111; border-right:1px solid #e2e8f0;">{{ $cust->name }}</td>
-                                    <td style="padding:4px 8px; border-right:1px solid #e2e8f0;">{{ $cust->mobile }}</td>
-                                    <td style="padding:4px 8px; color:#555; border-right:1px solid #e2e8f0;">{{ $cust->address ?: '—' }}</td>
+                                    <td style="padding:4px 8px; color:#444; border-right:1px solid #e2e8f0;">{{ $cust->address ?: '—' }}</td>
                                     <td style="padding:4px 8px; text-align:right; border-right:1px solid #e2e8f0;">{{ number_format($cust->total_sales ?? 0, 2) }}</td>
-                                    <td style="padding:4px 8px; text-align:right; border-right:1px solid #e2e8f0; color:#16a34a;">{{ number_format($cust->total_paid ?? 0, 2) }}</td>
+                                    <td style="padding:4px 8px; text-align:right; border-right:1px solid #e2e8f0; color:#16a34a; font-weight:600;">{{ number_format($cust->total_paid ?? 0, 2) }}</td>
                                     <td style="padding:4px 8px; text-align:right; font-weight:800; color:#dc2626; border-right:1px solid #e2e8f0; background:#fef2f2;">৳{{ number_format($cust->total_due ?? 0, 2) }}</td>
-                                    <td style="padding:4px 8px; border-right:1px solid #e2e8f0;"></td>
+                                    <td style="padding:4px 8px; text-align:center; border-right:1px solid #e2e8f0; font-weight:600;">{{ $cust->mobile }}</td>
                                     <td style="padding:4px 8px;"></td>
                                 </tr>
                             @endforeach
                             <tr style="background:#f1f5f9; font-weight:700; border-top:1.5px solid #cbd5e1;">
-                                <td colspan="4" style="padding:5px 8px; text-align:right;">{{ $areaName }} মোট:</td>
+                                <td colspan="3" style="padding:5px 8px; text-align:right;">{{ $areaName }} মোট:</td>
                                 <td style="padding:5px 8px; text-align:right;">৳{{ number_format($areaTotalSales, 2) }}</td>
                                 <td style="padding:5px 8px; text-align:right; color:#16a34a;">৳{{ number_format($areaTotalPaid, 2) }}</td>
                                 <td style="padding:5px 8px; text-align:right; color:#dc2626; background:#fee2e2;">৳{{ number_format($areaTotalDue, 2) }}</td>
@@ -452,13 +475,12 @@
                     <tr style="background:#0284c7; color:#fff;">
                         <th style="padding:5px; text-align:left; width:28px;">#</th>
                         <th style="padding:5px 8px; text-align:left;">কাস্টমারের নাম</th>
-                        <th style="padding:5px 8px; text-align:left; width:95px;">মোবাইল</th>
-                        <th style="padding:5px 8px; text-align:left;">এলাকা / ঠিকানা</th>
-                        <th style="padding:5px 8px; text-align:right; width:80px;">মোট ক্রয় (৳)</th>
-                        <th style="padding:5px 8px; text-align:right; width:75px;">পরিশোধ (৳)</th>
-                        <th style="padding:5px 8px; text-align:right; width:90px; background:#dc2626;">বকেয়া (৳)</th>
-                        <th style="padding:5px 8px; text-align:center; width:90px;">আদায় নোট</th>
-                        <th style="padding:5px 8px; text-align:center; width:80px;">স্বাক্ষর</th>
+                        <th style="padding:5px 8px; text-align:left;">ঠিকানা (শুধু গ্রাম)</th>
+                        <th style="padding:5px 8px; text-align:right; width:85px;">মোট ক্রয় (৳)</th>
+                        <th style="padding:5px 8px; text-align:right; width:80px;">মোট জমা (৳)</th>
+                        <th style="padding:5px 8px; text-align:right; width:95px; background:#dc2626;">বকেয়া (৳)</th>
+                        <th style="padding:5px 8px; text-align:center; width:100px;">ফোন নম্বর</th>
+                        <th style="padding:5px 8px; text-align:center; width:95px;">আদায় ও স্বাক্ষর</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -466,12 +488,11 @@
                         <tr style="background:{{ $cIdx % 2 === 0 ? '#fff' : '#f8fafc' }}; border-bottom:1px solid #e2e8f0;">
                             <td style="padding:4px 5px; border-right:1px solid #e2e8f0;">{{ $cIdx + 1 }}</td>
                             <td style="padding:4px 8px; font-weight:700; color:#111; border-right:1px solid #e2e8f0;">{{ $cust->name }}</td>
-                            <td style="padding:4px 8px; border-right:1px solid #e2e8f0;">{{ $cust->mobile }}</td>
-                            <td style="padding:4px 8px; color:#555; border-right:1px solid #e2e8f0;">{{ $cust->location_text }}</td>
+                            <td style="padding:4px 8px; color:#444; border-right:1px solid #e2e8f0;">{{ $cust->address ?: '—' }}</td>
                             <td style="padding:4px 8px; text-align:right; border-right:1px solid #e2e8f0;">{{ number_format($cust->total_sales ?? 0, 2) }}</td>
-                            <td style="padding:4px 8px; text-align:right; border-right:1px solid #e2e8f0; color:#16a34a;">{{ number_format($cust->total_paid ?? 0, 2) }}</td>
+                            <td style="padding:4px 8px; text-align:right; border-right:1px solid #e2e8f0; color:#16a34a; font-weight:600;">{{ number_format($cust->total_paid ?? 0, 2) }}</td>
                             <td style="padding:4px 8px; text-align:right; font-weight:800; color:#dc2626; border-right:1px solid #e2e8f0; background:#fef2f2;">৳{{ number_format($cust->total_due ?? 0, 2) }}</td>
-                            <td style="padding:4px 8px; border-right:1px solid #e2e8f0;"></td>
+                            <td style="padding:4px 8px; text-align:center; border-right:1px solid #e2e8f0; font-weight:600;">{{ $cust->mobile }}</td>
                             <td style="padding:4px 8px;"></td>
                         </tr>
                     @endforeach
@@ -611,11 +632,13 @@
 
 <style>
 @media print {
-    #sendDueReminderSmsModal {
+    #sendDueReminderSmsModal, #collectCustomerDueModal {
         display: none !important;
     }
 }
 </style>
+
+@include('admin.pages.customer-payments.partials.collect-modal')
 @endsection
 
 @push('scripts')

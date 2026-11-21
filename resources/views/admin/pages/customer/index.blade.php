@@ -19,6 +19,13 @@
                 <i class="fa-solid fa-file-invoice-dollar"></i>
                 <span>এলাকাভিত্তিক বকেয়া শিট</span>
             </a>
+            <button type="button" 
+                    class="btn btn-outline-success rounded-pill px-3 py-2 fw-semibold shadow-sm d-flex align-items-center gap-2" 
+                    onclick="openCollectDueModal()"
+                    style="font-size: 0.85rem;">
+                <i class="fa-solid fa-hand-holding-dollar"></i>
+                <span>বকেয়া টাকা জমা</span>
+            </button>
             <a href="{{ route('admin.customer.create') }}" class="btn btn-primary rounded-pill px-3 py-2 fw-semibold shadow-sm d-flex align-items-center gap-2" style="font-size: 0.85rem;">
                 <i class="fa-solid fa-user-plus"></i>
                 <span>নতুন কাস্টমার যোগ করুন</span>
@@ -229,6 +236,15 @@
                             </td>
                             <td class="pe-4 text-end">
                                 <div class="d-inline-flex align-items-center gap-1">
+                                    @if($totalDue > 0)
+                                        <button type="button" 
+                                                class="btn btn-sm btn-outline-success rounded-pill px-2.5 py-1 fw-semibold" 
+                                                style="font-size: 0.75rem;" 
+                                                onclick="openCollectDueModal({{ $customer->id }}, '{{ addslashes($customer->name) }}', '{{ $customer->mobile }}', {{ $totalDue }})" 
+                                                title="বকেয়া টাকা জমা নিন">
+                                            <i class="fa-solid fa-hand-holding-dollar me-1"></i>জমা
+                                        </button>
+                                    @endif
                                     <a href="{{ route('admin.customer.show', $customer) }}"
                                        class="btn btn-sm btn-light border rounded-pill px-2.5 py-1 text-primary shadow-xs"
                                        title="লেজার ও বিস্তারিত হিসাব">
@@ -289,6 +305,8 @@
         @endif
     </div>
 </div>
+
+@include('admin.pages.customer-payments.partials.collect-modal')
 @endsection
 
 @push('scripts')

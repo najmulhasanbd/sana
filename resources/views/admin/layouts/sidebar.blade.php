@@ -86,7 +86,7 @@
             </li>
 
             <!-- Sales Management Dropdown -->
-            <li class="nav-item has-dropdown {{ request()->routeIs('admin.sales.*') || request()->routeIs('admin.sale-product.*') || request()->routeIs('admin.customer.*') || request()->routeIs('admin.customer-due.*') ? 'open' : '' }}">
+            <li class="nav-item has-dropdown {{ request()->routeIs('admin.sales.*') || request()->routeIs('admin.sale-product.*') || request()->routeIs('admin.customer.*') || request()->routeIs('admin.customer-due.*') || request()->routeIs('admin.customer-payments.*') ? 'open' : '' }}">
                 <div class="dropdown-header">
                     <div class="nav-icon-box">
                         <i class="fa-solid fa-receipt"></i>
@@ -105,6 +105,12 @@
                         <a href="{{ route('admin.customer-due.index') }}" class="{{ request()->routeIs('admin.customer-due.*') ? 'active' : '' }}">
                             <i class="fa-solid fa-circle-dot submenu-dot text-danger"></i>
                             <span>কাস্টমার বকেয়া শিট (Due Sheet)</span>
+                        </a>
+                    </li>
+                    <li class="{{ request()->routeIs('admin.customer-payments.*') ? 'active' : '' }}">
+                        <a href="{{ route('admin.customer-payments.index') }}" class="{{ request()->routeIs('admin.customer-payments.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-circle-dot submenu-dot text-success"></i>
+                            <span>বকেয়া জমা ভাউচার (Receipts)</span>
                         </a>
                     </li>
                     <li class="{{ request()->routeIs('admin.customer.index') || request()->routeIs('admin.customer.show') || request()->routeIs('admin.customer.edit') ? 'active' : '' }}">

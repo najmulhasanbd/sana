@@ -275,6 +275,34 @@ class SmsService
     }
 
     /**
+     * Replace placeholders for a Customer Due Payment / Money Receipt SMS.
+     */
+    public function renderCustomerPaymentTemplate(
+        string $template,
+        Customer $customer,
+        float $paidAmount,
+        float $previousDue,
+        float $remainingDue,
+        string $voucherNo
+    ): string {
+        $companyName = Setting::get('business_name', 'সানা ফিশারিজ');
+        $companyPhone = Setting::get('mobile', Setting::get('proprietor_mobile', ''));
+
+        $replacements = [
+            '{customer_name}' => $customer->name,
+            '{paid_amount}' => number_format($paidAmount, 2),
+            '{previous_due}' => number_format($previousDue, 2),
+            '{due_amount}' => number_format($remainingDue, 2),
+            '{remaining_due}' => number_format($remainingDue, 2),
+            '{voucher_no}' => $voucherNo,
+            '{company_name}' => $companyName,
+            '{company_phone}' => $companyPhone,
+        ];
+
+        return str_replace(array_keys($replacements), array_values($replacements), $template);
+    }
+
+    /**
      * Replace placeholders for a Broadcast Notice SMS.
      */
     public function renderBroadcastTemplate(string $template, ?Customer $customer = null): string

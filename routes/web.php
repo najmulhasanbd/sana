@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CashBookController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\CustomerDueController;
+use App\Http\Controllers\Admin\CustomerPaymentController;
 use App\Http\Controllers\Admin\DesignationController;
 use App\Http\Controllers\Admin\DistrictController;
 use App\Http\Controllers\Admin\DivisionController;
@@ -74,6 +75,10 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
 
     // Customer Due Sheet & Area-wise Collection Report (বকেয়া শিট ও এলাকাভিত্তিক হিসাব)
     Route::get('reports/customer-due-sheet', [CustomerDueController::class, 'index'])->name('admin.customer-due.index');
+
+    // Customer Direct Due Collection & Money Receipt Vouchers (বকেয়া আদায় ও মানি রিসিট ভাউচার)
+    Route::post('customer-payments/{customerPayment}/send-sms', [CustomerPaymentController::class, 'sendSms'])->name('admin.customer-payments.send-sms');
+    Route::resource('customer-payments', CustomerPaymentController::class)->names('admin.customer-payments');
 
     // Customers (কাস্টমার তালিকা ও লেজার হিসাব)
     Route::patch('customers/{customer}/toggle-status', [CustomerController::class, 'toggleStatus'])->name('admin.customer.toggle-status');

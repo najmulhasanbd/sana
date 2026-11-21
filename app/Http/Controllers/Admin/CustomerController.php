@@ -231,6 +231,11 @@ class CustomerController extends Controller
             ->latest('id')
             ->get();
 
+        $payments = $customer->customerPayments()
+            ->latest('payment_date')
+            ->latest('id')
+            ->get();
+
         $stats = [
             'total_invoices' => $sales->count(),
             'total_purchased' => (float) $sales->sum('total_amount'),
@@ -238,7 +243,7 @@ class CustomerController extends Controller
             'total_due' => (float) $sales->sum('due_amount'),
         ];
 
-        return view('admin.pages.customer.show', compact('customer', 'sales', 'stats'));
+        return view('admin.pages.customer.show', compact('customer', 'sales', 'payments', 'stats'));
     }
 
     /**

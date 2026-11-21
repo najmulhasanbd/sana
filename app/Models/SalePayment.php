@@ -15,6 +15,7 @@ class SalePayment extends Model
      */
     protected $fillable = [
         'sales_id',
+        'customer_payment_id',
         'payment_date',
         'amount',
         'payment_method',
@@ -27,6 +28,7 @@ class SalePayment extends Model
      */
     protected $casts = [
         'sales_id' => 'integer',
+        'customer_payment_id' => 'integer',
         'payment_date' => 'date',
         'amount' => 'decimal:2',
     ];
@@ -37,5 +39,13 @@ class SalePayment extends Model
     public function sale(): BelongsTo
     {
         return $this->belongsTo(Sales::class, 'sales_id');
+    }
+
+    /**
+     * @return BelongsTo<CustomerPayment, SalePayment>
+     */
+    public function customerPayment(): BelongsTo
+    {
+        return $this->belongsTo(CustomerPayment::class, 'customer_payment_id');
     }
 }
