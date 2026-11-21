@@ -558,11 +558,11 @@
                             <label for="password" class="block text-xs sm:text-sm font-semibold text-slate-200">
                                 পাসওয়ার্ড <span class="text-cyan-400 font-normal">(Password)</span>
                             </label>
-                            @if (Route::has('password.request'))
+                            <!-- @if (Route::has('password.request'))
                                 <a href="{{ route('password.request') }}" class="text-xs text-cyan-400 hover:text-cyan-300 font-medium transition duration-150 underline-offset-2 hover:underline">
                                     পাসওয়ার্ড ভুলে গেছেন?
                                 </a>
-                            @endif
+                            @endif -->
                         </div>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -599,7 +599,7 @@
                     </div>
 
                     <!-- Remember Me Checkbox -->
-                    <div class="flex items-center justify-between pt-1">
+                    <!-- <div class="flex items-center justify-between pt-1">
                         <label for="remember_me" class="inline-flex items-center cursor-pointer select-none">
                             <input 
                                 id="remember_me" 
@@ -609,7 +609,7 @@
                             >
                             <span class="ms-2.5 text-xs sm:text-sm text-slate-300 font-medium">আমাকে মনে রাখুন (Remember me)</span>
                         </label>
-                    </div>
+                    </div> -->
 
                     <!-- Submit Button -->
                     <div class="pt-2">

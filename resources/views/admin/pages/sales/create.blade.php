@@ -64,9 +64,15 @@
                         <div class="row g-3">
                             <!-- Existing Customer Select (Quick Search) -->
                             <div class="col-12">
-                                <label class="form-label fw-semibold text-secondary" style="font-size: 0.85rem;">
-                                    পূর্ববর্তী কাস্টমার নির্বাচন করুন (নাম বা মোবাইল দিয়ে খুঁজুন) <small class="text-muted">(নতুন হলে নিচে সরাসরি পূরণ করুন)</small>
-                                </label>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label class="form-label fw-semibold text-secondary mb-0" style="font-size: 0.85rem;">
+                                        পূর্ববর্তী কাস্টমার নির্বাচন করুন (নাম বা মোবাইল দিয়ে খুঁজুন) <small class="text-muted">(নতুন হলে নিচে সরাসরি পূরণ করুন)</small>
+                                    </label>
+                                    <a href="{{ route('admin.customer.create') }}" target="_blank" class="text-primary text-decoration-none fw-semibold small d-inline-flex align-items-center gap-1" title="নতুন কাস্টমার পেজ ওপেন করুন">
+                                        <i class="fa-solid fa-user-plus"></i>
+                                        <span>+ কাস্টমার ডাটাবেজে যুক্ত করুন</span>
+                                    </a>
+                                </div>
                                 <select id="existingCustomerSelect" class="form-select" data-placeholder="-- সংরক্ষিত কাস্টমার খুঁজুন বা নিচে নতুন তথ্য দিন --">
                                     <option value="">-- সংরক্ষিত কাস্টমার খুঁজুন বা নিচে নতুন তথ্য দিন --</option>
                                     @foreach($customers as $customer)

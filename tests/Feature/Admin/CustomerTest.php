@@ -116,4 +116,94 @@ class CustomerTest extends TestCase
             'id' => $customerToDelete->id,
         ]);
     }
+
+    public function test_can_view_customer_create_page(): void
+    {
+        $response = $this->actingAs($this->user)->get(route('admin.customer.create'));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('admin.pages.customer.create');
+        $response->assertSee('নতুন কাস্টমার যোগ');
+        $response->assertSee('কাস্টমারের নাম');
+        $response->assertSee('মোবাইল নম্বর');
+    }
+
+    public function test_can_store_customer_without_sale(): void
+    {
+        $payload = [
+            'name' => 'মোঃ আসাদুল হক',
+            'mobile' => '01888123456',
+            'email' => 'asadul@gmail.com',
+            'division_id' => $this->division->id,
+            'district_id' => $this->district->id,
+            'zone_id' => $this->zone->id,
+            'address' => 'দক্ষিণ শ্রীপুর বাজার',
+            'note' => 'নতুন চাষী কাস্টমার',
+            'status' => '1',
+        ];
+
+        $response = $this->actingAs($this->user)->post(route('admin.customer.store'), $payload);
+
+        $response->assertRedirect(route('admin.customer.index'));
+        $this->assertDatabaseHas('customers', [
+            'name' => 'মোঃ আসাদুল হক',
+            'mobile' => '01888123456',
+            'address' => 'দক্ষিণ শ্রীপুর বাজার',
+            'status' => 1,
+        ]);
+    }
+
+    public function test_store_customer_fails_on_duplicate_mobile(): void
+    {
+        $response = $this->actingAs($this->user)->post(route('admin.customer.store'), [
+            'name' => 'অন্য কাস্টমার',
+            'mobile' => '01711223344', // already belongs to $this->customer
+        ]);
+
+        $response->assertSessionHasErrors(['mobile']);
+    }
+
+    public function test_can_view_customer_edit_page(): void
+    {
+        $response = $this->actingAs($this->user)->get(route('admin.customer.edit', $this->customer));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('admin.pages.customer.edit');
+        $response->assertSee($this->customer->name);
+        $response->assertSee($this->customer->mobile);
+    }
+
+    public function test_can_update_customer(): void
+    {
+        $payload = [
+            'name' => 'মোঃ জহিরুল ইসলাম রানা',
+            'mobile' => '01711223344', // keeps own mobile
+            'email' => 'rana@gmail.com',
+            'division_id' => $this->division->id,
+            'district_id' => $this->district->id,
+            'zone_id' => $this->zone->id,
+            'address' => 'মাওনা বাজার, আপডেটেড ঠিকানা',
+            'status' => '1',
+        ];
+
+        $response = $this->actingAs($this->user)->put(route('admin.customer.update', $this->customer), $payload);
+
+        $response->assertRedirect(route('admin.customer.index'));
+        $this->assertDatabaseHas('customers', [
+            'id' => $this->customer->id,
+            'name' => 'মোঃ জহিরুল ইসলাম রানা',
+            'address' => 'মাওনা বাজার, আপডেটেড ঠিকানা',
+        ]);
+    }
+
+    public function test_can_toggle_customer_status(): void
+    {
+        $response = $this->actingAs($this->user)->patch(route('admin.customer.toggle-status', $this->customer));
+
+        $response->assertStatus(302);
+        $this->assertDatabaseHas('customers', [
+            'id' => $this->customer->id,
+            'status' => 0,
+        ]);
+    }
 }

@@ -76,7 +76,8 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
     Route::get('reports/customer-due-sheet', [CustomerDueController::class, 'index'])->name('admin.customer-due.index');
 
     // Customers (কাস্টমার তালিকা ও লেজার হিসাব)
-    Route::resource('customers', CustomerController::class)->only(['index', 'show', 'destroy'])->names('admin.customer');
+    Route::patch('customers/{customer}/toggle-status', [CustomerController::class, 'toggleStatus'])->name('admin.customer.toggle-status');
+    Route::resource('customers', CustomerController::class)->names('admin.customer');
 
     // Purchases (মাছ ও পণ্য ক্রয় ও বকেয়া হিসাব)
     Route::post('purchases/{purchase}/payments', [PurchaseController::class, 'addPayment'])->name('admin.purchase.payment.store');

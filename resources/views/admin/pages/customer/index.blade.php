@@ -19,7 +19,11 @@
                 <i class="fa-solid fa-file-invoice-dollar"></i>
                 <span>এলাকাভিত্তিক বকেয়া শিট</span>
             </a>
-            <a href="{{ route('admin.sales.create') }}" class="btn btn-primary rounded-pill px-3 py-2 fw-semibold shadow-sm d-flex align-items-center gap-2" style="font-size: 0.85rem;">
+            <a href="{{ route('admin.customer.create') }}" class="btn btn-primary rounded-pill px-3 py-2 fw-semibold shadow-sm d-flex align-items-center gap-2" style="font-size: 0.85rem;">
+                <i class="fa-solid fa-user-plus"></i>
+                <span>নতুন কাস্টমার যোগ করুন</span>
+            </a>
+            <a href="{{ route('admin.sales.create') }}" class="btn btn-outline-primary rounded-pill px-3 py-2 fw-semibold shadow-sm d-flex align-items-center gap-2" style="font-size: 0.85rem;">
                 <i class="fa-solid fa-plus"></i>
                 <span>নতুন বিক্রয় চালান</span>
             </a>
@@ -230,6 +234,12 @@
                                        title="লেজার ও বিস্তারিত হিসাব">
                                         <i class="fa-solid fa-book-open me-1"></i>লেজার
                                     </a>
+                                    <a href="{{ route('admin.customer.edit', $customer) }}"
+                                       class="btn btn-sm btn-light border rounded-circle text-secondary p-0 d-inline-flex align-items-center justify-content-center hover-primary"
+                                       style="width: 28px; height: 28px;"
+                                       title="তথ্য সম্পাদনা করুন">
+                                        <i class="fa-solid fa-pen-to-square" style="font-size: 0.78rem;"></i>
+                                    </a>
                                     <form action="{{ route('admin.customer.destroy', $customer) }}"
                                           method="POST"
                                           onsubmit="return confirm('আপনি কি নিশ্চিত যে কাস্টমার {{ $customer->name }} মুছে ফেলতে চান?');"
@@ -252,9 +262,12 @@
                                 <div class="py-4">
                                     <i class="fa-solid fa-users-slash text-muted opacity-50 mb-3" style="font-size: 3rem;"></i>
                                     <h6 class="text-muted fw-bold">কোন কাস্টমার পাওয়া যায়নি</h6>
-                                    <p class="text-muted small mb-3">আপনার সার্চ ফিল্টার পরিবর্তন করুন অথবা নতুন বিক্রয় চালান তৈরি করুন</p>
-                                    <a href="{{ route('admin.sales.create') }}" class="btn btn-sm btn-primary rounded-pill px-3 py-1.5 fw-semibold shadow-sm">
-                                        <i class="fa-solid fa-plus me-1"></i>নতুন বিক্রয় চালান তৈরি করুন
+                                    <p class="text-muted small mb-3">আপনার সার্চ ফিল্টার পরিবর্তন করুন অথবা নতুন কাস্টমার ও বিক্রয় চালান তৈরি করুন</p>
+                                    <a href="{{ route('admin.customer.create') }}" class="btn btn-sm btn-primary rounded-pill px-3 py-1.5 fw-semibold shadow-sm me-2">
+                                        <i class="fa-solid fa-user-plus me-1"></i>নতুন কাস্টমার যোগ করুন
+                                    </a>
+                                    <a href="{{ route('admin.sales.create') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1.5 fw-semibold shadow-sm">
+                                        <i class="fa-solid fa-plus me-1"></i>নতুন বিক্রয় চালান
                                     </a>
                                 </div>
                             </td>

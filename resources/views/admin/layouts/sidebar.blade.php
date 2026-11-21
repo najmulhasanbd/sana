@@ -107,10 +107,16 @@
                             <span>কাস্টমার বকেয়া শিট (Due Sheet)</span>
                         </a>
                     </li>
-                    <li class="{{ request()->routeIs('admin.customer.*') ? 'active' : '' }}">
-                        <a href="{{ route('admin.customer.index') }}" class="{{ request()->routeIs('admin.customer.*') ? 'active' : '' }}">
+                    <li class="{{ request()->routeIs('admin.customer.index') || request()->routeIs('admin.customer.show') || request()->routeIs('admin.customer.edit') ? 'active' : '' }}">
+                        <a href="{{ route('admin.customer.index') }}" class="{{ request()->routeIs('admin.customer.index') || request()->routeIs('admin.customer.show') || request()->routeIs('admin.customer.edit') ? 'active' : '' }}">
                             <i class="fa-solid fa-circle-dot submenu-dot"></i>
                             <span>কাস্টমার তালিকা (Customers)</span>
+                        </a>
+                    </li>
+                    <li class="{{ request()->routeIs('admin.customer.create') ? 'active' : '' }}">
+                        <a href="{{ route('admin.customer.create') }}" class="{{ request()->routeIs('admin.customer.create') ? 'active' : '' }}">
+                            <i class="fa-solid fa-circle-dot submenu-dot text-primary"></i>
+                            <span>নতুন কাস্টমার (Add Customer)</span>
                         </a>
                     </li>
                     <li class="{{ request()->routeIs('admin.sale-product.*') ? 'active' : '' }}">

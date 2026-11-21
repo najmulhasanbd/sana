@@ -7,8 +7,10 @@ use App\Models\Customer;
 use App\Models\District;
 use App\Models\Division;
 use App\Models\Zone;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class CustomerController extends Controller
@@ -88,6 +90,132 @@ class CustomerController extends Controller
             'districtId',
             'zoneId'
         ));
+    }
+
+    /**
+     * Show the form for creating a new customer before any sale.
+     */
+    public function create(): View
+    {
+        $divisions = Division::active()->orderBy('name')->get();
+        $districts = District::with('division')->active()->orderBy('name')->get();
+        $zones = Zone::with('district')->active()->orderBy('name')->get();
+
+        return view('admin.pages.customer.create', compact('divisions', 'districts', 'zones'));
+    }
+
+    /**
+     * Store a newly created customer in storage (without requiring a sale).
+     */
+    public function store(Request $request): RedirectResponse|JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:150'],
+            'mobile' => ['required', 'string', 'max:30', 'unique:customers,mobile'],
+            'email' => ['nullable', 'email', 'max:100'],
+            'division_id' => ['nullable', 'exists:divisions,id'],
+            'district_id' => ['nullable', 'exists:districts,id'],
+            'zone_id' => ['nullable', 'exists:zones,id'],
+            'address' => ['nullable', 'string', 'max:500'],
+            'note' => ['nullable', 'string', 'max:1000'],
+            'status' => ['nullable'],
+        ], [
+            'name.required' => 'কাস্টমারের নাম আবশ্যক।',
+            'mobile.required' => 'মোবাইল নম্বর আবশ্যক।',
+            'mobile.unique' => 'এই মোবাইল নম্বরের কাস্টমার ইতিমধ্যে সিস্টেমে সংরক্ষিত আছে।',
+            'email.email' => 'একটি সঠিক ইমেইল ঠিকানা প্রদান করুন।',
+            'division_id.exists' => 'নির্বাচিত বিভাগ সঠিক নয়।',
+            'district_id.exists' => 'নির্বাচিত জেলা সঠিক নয়।',
+            'zone_id.exists' => 'নির্বাচিত জোন সঠিক নয়।',
+        ]);
+
+        $validated['status'] = $request->has('status') ? (bool) $request->input('status') : true;
+
+        $customer = Customer::create($validated);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'নতুন কাস্টমার সফলভাবে সংরক্ষিত হয়েছে!',
+                'customer' => $customer->load(['division', 'district', 'zone']),
+            ]);
+        }
+
+        if (function_exists('toastr')) {
+            toastr()->success("নতুন কাস্টমার '{$customer->name}' সফলভাবে যোগ করা হয়েছে!", 'সফল');
+        }
+
+        return redirect()->route('admin.customer.index');
+    }
+
+    /**
+     * Show the form for editing the specified customer.
+     */
+    public function edit(Customer $customer): View
+    {
+        $divisions = Division::active()->orderBy('name')->get();
+        $districts = District::with('division')->active()->orderBy('name')->get();
+        $zones = Zone::with('district')->active()->orderBy('name')->get();
+
+        return view('admin.pages.customer.edit', compact('customer', 'divisions', 'districts', 'zones'));
+    }
+
+    /**
+     * Update the specified customer in storage.
+     */
+    public function update(Request $request, Customer $customer): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:150'],
+            'mobile' => ['required', 'string', 'max:30', Rule::unique('customers', 'mobile')->ignore($customer->id)],
+            'email' => ['nullable', 'email', 'max:100'],
+            'division_id' => ['nullable', 'exists:divisions,id'],
+            'district_id' => ['nullable', 'exists:districts,id'],
+            'zone_id' => ['nullable', 'exists:zones,id'],
+            'address' => ['nullable', 'string', 'max:500'],
+            'note' => ['nullable', 'string', 'max:1000'],
+            'status' => ['nullable'],
+        ], [
+            'name.required' => 'কাস্টমারের নাম আবশ্যক।',
+            'mobile.required' => 'মোবাইল নম্বর আবশ্যক।',
+            'mobile.unique' => 'এই মোবাইল নম্বরের অন্য একজন কাস্টমার ইতিমধ্যে সংরক্ষিত আছে।',
+            'email.email' => 'একটি সঠিক ইমেইল ঠিকানা প্রদান করুন।',
+            'division_id.exists' => 'নির্বাচিত বিভাগ সঠিক নয়।',
+            'district_id.exists' => 'নির্বাচিত জেলা সঠিক নয়।',
+            'zone_id.exists' => 'নির্বাচিত জোন সঠিক নয়।',
+        ]);
+
+        $validated['status'] = $request->has('status') ? (bool) $request->input('status') : false;
+
+        $customer->update($validated);
+
+        if (function_exists('toastr')) {
+            toastr()->success("কাস্টমার '{$customer->name}'-এর তথ্য সফলভাবে হালনাগাদ করা হয়েছে!", 'সফল');
+        }
+
+        return redirect()->route('admin.customer.index');
+    }
+
+    /**
+     * Toggle the status of the specified customer.
+     */
+    public function toggleStatus(Customer $customer): JsonResponse|RedirectResponse
+    {
+        $customer->update(['status' => ! $customer->status]);
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'status' => $customer->status,
+                'message' => 'কাস্টমারের স্ট্যাটাস পরিবর্তিত হয়েছে।',
+            ]);
+        }
+
+        if (function_exists('toastr')) {
+            toastr()->success('কাস্টমারের সক্রিয়/নিষ্ক্রিয় স্ট্যাটাস পরিবর্তিত হয়েছে!', 'সফল');
+        }
+
+        return back();
     }
 
     /**
